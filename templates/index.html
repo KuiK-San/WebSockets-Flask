@@ -4,23 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
 </head>
 <body>
     <h1>Localizador</h1>
+    <div id="map" style="width: 1200px; height: 800px; background-color: green;"></div>
     <p id="count"></p>
     <p id="coord"></p>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
     <script>
         
         var i = 0;
         var socket = io.connect('http://' + document.domain + ":" + location.port);
         let coords = document.querySelector('#coord');
+        
+        mapboxgl.accessToken = "pk.eyJ1IjoidGhlZ3VpNDAwMCIsImEiOiJjbGtqeXRnNWYwbjlrM2dvYXYxZXVwY2FjIn0.RSEC3oyLBXLiL9ybKmOEIQ"
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [-74.5, 40],
+            zoom: 9
+        })
+
         socket.on('message', (message) => {
             console.log(message)
             coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
             i++
             document.querySelector('#count').innerHTML = i;
         })
+        
+        
     </script>
 </body>
 </html>
