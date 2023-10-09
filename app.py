@@ -1,18 +1,18 @@
 from flask import Flask, request, render_template, jsonify
 from flask import request
 from flask_socketio import SocketIO
+from urllib.parse import parse_qs
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-@app.route("/log", methods=['GET'])
+@app.route("/log", methods=['POST'])
 def log():
-    lat = request.args.get('lat')
-    lon = request.args.get('lon')
-    time = request.args.get('time')
-    message = {'lat': lat, 'lon': lon, 'time': time}
-    socketio.emit('teste', message)
-    return jsonify({"status": "ok"})
+    data = request.data
+    dt_str = data.decode('utf-8')
+    data = parse_qs(dt_str)
+    print(data)
+    return jsonify({"status": "200"})
 
 @app.route('/', methods=['GET'])
 def index():
