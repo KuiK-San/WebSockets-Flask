@@ -6,15 +6,20 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Teste</h1>
+    <h1>Localizador</h1>
+    <p id="count"></p>
     <p id="coord"></p>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
     <script>
-        var socket = io.connect('http://' + document.domain + ":" + location.port)
-        let coords = document.querySelector('#coord')
-        socket.on('teste', (message) => {
+        
+        var i = 0;
+        var socket = io.connect('http://' + document.domain + ":" + location.port);
+        let coords = document.querySelector('#coord');
+        socket.on('message', (message) => {
             console.log(message)
-            coords.innerHTML += `${message}</br>`
+            coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
+            i++
+            document.querySelector('#count').innerHTML = i;
         })
     </script>
 </body>
