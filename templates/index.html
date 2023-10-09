@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Localizador</h1>
-    <div id="map" style="width: 1200px; height: 800px; background-color: green;"></div>
+    <div id="map" style="width: 1200px; height: 800px; background-color: green;display: block;"></div>
     <p id="count"></p>
     <p id="coord"></p>
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
@@ -23,15 +23,18 @@
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
-            center: [-74.5, 40],
-            zoom: 9
+            zoom: 0
         })
 
         socket.on('message', (message) => {
-            console.log(message)
+            // console.log(message)
             coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
             i++
+            map.
             document.querySelector('#count').innerHTML = i;
+        })
+        socket.on('data', (data) =>{
+            console.log(data)
         })
         
         

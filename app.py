@@ -18,6 +18,7 @@ def log():
     horario = data_e_hora_atuais.strftime("%H:%M:%S %d/%m/%Y")
 
     socketio.emit('message', {"lat":lat, "lon": lon,"horario": horario})
+    socketio.emit('data', data)
 
     return jsonify({"status": "200"})
 
