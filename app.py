@@ -17,8 +17,8 @@ def log():
     data = request.data
     dt_str = data.decode('utf-8')
     data = parse_qs(dt_str)
-    lat = data['lat'][0]
-    lon = data['lon'][0]
+    lat = round(data['lat'][0], 4)
+    lon = round(data['lon'][0], 4)
     data_e_hora_atuais = datetime.now()
     horario = data_e_hora_atuais.strftime("%H:%M:%S %d/%m/%Y")
     dia = data_e_hora_atuais.strftime("%d/%m/%Y")
