@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Localizador</title>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
 </head>
 <body>
@@ -32,17 +32,16 @@
             i++;
             document.querySelector('#count').innerHTML = i;
 
-            if (!marker) { 
+            if(!marker){ 
                 marker = new mapboxgl.Marker({
                     element: createCustomMarker()
                 })
                 .setLngLat([message.lon, message.lat])
                 .addTo(map);
 
-                
                 map.flyTo({
                     center: [message.lon, message.lat],
-                    zoom: 17 
+                    zoom: 17
                 });
             }
         });
@@ -52,21 +51,59 @@
         });
 
         function createCustomMarker() {
-            var el = document.createElement('div');
-            var eel = document.createElement('div');
-            el.className = 'custom-marker';
-            eel.className = 'custom-marker';
-            return el;
+            var container = document.createElement('div');
+            container.className = 'marker-container';
+
+            var pulsatingCircle = document.createElement('div');
+            pulsatingCircle.className = 'pulsating-circle';
+
+            var locationMarker = document.createElement('div');
+            locationMarker.className = 'custom-marker';
+
+            container.appendChild(pulsatingCircle);
+            container.appendChild(locationMarker);
+
+            return container;
         }
     </script>
 
     <style>
+        .marker-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .custom-marker {
             width: 15px;
             height: 15px;
             background-color: blue;
             border-radius: 50%;
-            opacity: 50%;
+        }
+
+        .pulsating-circle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 255, 0.3);
+            border-radius: 50%;
+            animation: pulsate 1.5s infinite;
+        }
+
+        @keyframes pulsate {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
         }
     </style>
 </body>
