@@ -14,7 +14,6 @@
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
     <script>
-        
         var i = 0;
         var socket = io.connect('http://' + document.domain + ":" + location.port);
         let coords = document.querySelector('#coord');
@@ -24,20 +23,51 @@
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
             zoom: 0
-        })
+        });
+
+        var marker; 
 
         socket.on('message', (message) => {
-            // console.log(message)
             coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
-            i++
-            map.
+            i++;
             document.querySelector('#count').innerHTML = i;
-        })
+
+            if (!marker) { 
+                marker = new mapboxgl.Marker({
+                    element: createCustomMarker()
+                })
+                .setLngLat([message.lon, message.lat])
+                .addTo(map);
+
+                
+                map.flyTo({
+                    center: [message.lon, message.lat],
+                    zoom: 17 
+                });
+            }
+        });
+
         socket.on('data', (data) =>{
             console.log(data)
-        })
-        
-        
+        });
+
+        function createCustomMarker() {
+            var el = document.createElement('div');
+            var eel = document.createElement('div');
+            el.className = 'custom-marker';
+            eel.className = 'custom-marker';
+            return el;
+        }
     </script>
+
+    <style>
+        .custom-marker {
+            width: 15px;
+            height: 15px;
+            background-color: blue;
+            border-radius: 50%;
+            opacity: 50%;
+        }
+    </style>
 </body>
 </html>
