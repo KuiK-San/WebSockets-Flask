@@ -24,7 +24,7 @@
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
-            zoom: 0
+            zoom: -0.5
         });
 
         var marker; 
@@ -45,6 +45,12 @@
                 .setLngLat([message.lon, message.lat])
                 .addTo(map);
 
+                map.flyTo({
+                    center: [message.lon, message.lat],
+                    zoom: 17
+                });
+            }else{
+                marker.setLngLat([message.lon, message.lat])
                 map.flyTo({
                     center: [message.lon, message.lat],
                     zoom: 17
