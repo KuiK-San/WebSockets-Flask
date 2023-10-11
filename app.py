@@ -17,8 +17,8 @@ def log():
     data = request.data
     dt_str = data.decode('utf-8')
     data = parse_qs(dt_str)
-    lat = round(data['lat'][0], 4)
-    lon = round(data['lon'][0], 4)
+    lat = round(float(data['lat'][0]), 4)
+    lon = round(float(data['lon'][0]), 4)
     data_e_hora_atuais = datetime.now()
     horario = data_e_hora_atuais.strftime("%H:%M:%S %d/%m/%Y")
     dia = data_e_hora_atuais.strftime("%d/%m/%Y")
@@ -27,33 +27,39 @@ def log():
     if not collection.find_one({'serial': serial}):
         document = {
             'serial': str(data['ser'][0]),
-            f'rota_{dia}': {
-                str(0):{
-                    'lat': float(lat),
-                    'lon': float(lon) 
+            'perfil': data['profile'][0],
+            'rotas': {
+                f'rota_{dia}': {
+                    str(0):{
+                        'lat': float(lat),
+                        'lon': float(lon),
+                        'precisão': round(float(data['acc'][0]), 3),
+                        'horario': str(horario)
+                    }
                 }
             }
         }
 
         collection.insert_one(document)
 
-    elif collection.find_one({'serial': serial}) and not f'rota_{dia}' in  collection.find_one({'serial': serial}):
-
-        collection.update_one({'serial': serial}, {"$set": {f"rota_{dia}.{str(0)}": {
+    elif collection.find_one({'serial': serial}) and not f'rota_{dia}' in  collection.find_one({'serial': serial})['rotas']:
+        doc = collection.find_one({'serial': serial})
+        collection.update_one({'serial': serial}, {"$set": {f"rotas.rota_{dia}.{str(0)}": {
             'lat': float(lat),
-            'lon': float(lon)
+            'lon': float(lon),
+            'precisão': round(float(data['acc'][0]), 3),
+            'horario': str(horario)
         }}})
 
     else:
         doc = collection.find_one({'serial': serial})
-        quantidade = len(doc[f'rota_{dia}'])
-        collection.update_one({'serial': serial}, {"$set": {f"rota_{dia}.{str(quantidade)}": {
+        quantidade = len(doc['rotas'][f'rota_{dia}'])
+        collection.update_one({'serial': serial}, {"$set": {f"rotas.rota_{dia}.{str(quantidade)}": {
             'lat': float(lat),
-            'lon': float(lon)
+            'lon': float(lon),
+            'precisão': round(float(data['acc'][0]), 3),
+            'horario': str(horario)
         }}})
-
-    socketio.emit('message', {"lat":lat, "lon": lon,"horario": horario})
-    socketio.emit('data', data)
 
     return jsonify({"status": "200"})
 
