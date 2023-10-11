@@ -61,7 +61,7 @@ def log():
             'horario': str(horario)
         }}})
 
-    socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario})
+    socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario, 'serial': serial})
 
     return jsonify({"status": "200"})
 
@@ -81,15 +81,15 @@ def pega_disp():
 
     return jsonify(serials)
 
-@app.route('/api/pega_horarios')
+@app.route('/api/pega_dias')
 def pega_horarios():
     serial = request.args.get('serial')
     doc = collection.find_one({'serial': serial})
 
-    datas :dict = {}
+    datas :list = []
 
     for i, rota in enumerate(doc['rotas']):
-        datas[f"{rota.split('_')[1]}"] = doc['rotas'][rota]
+        datas.append(str(rota.split('_')[1]))
 
     return jsonify(datas)
 

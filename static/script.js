@@ -14,38 +14,40 @@ var marker;
 var routeCoordinates = [];
 
 socket.on('message', (message) => {
-    coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
-    i++;
-    document.querySelector('#count').innerHTML = i;
+    if(message.serial == document.querySelector('#dispositivos').value){
+        coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
+        i++;
+        document.querySelector('#count').innerHTML = i;
 
-    routeCoordinates.push([message.lon, message.lat]);
+        routeCoordinates.push([message.lon, message.lat]);
 
-    if (!marker) { 
-        marker = new mapboxgl.Marker({
-            element: createCustomMarker()
-        })
-        .setLngLat([message.lon, message.lat])
-        .addTo(map);
+        if (!marker) { 
+            marker = new mapboxgl.Marker({
+                element: createCustomMarker()
+            })
+            .setLngLat([message.lon, message.lat])
+            .addTo(map);
 
-        map.flyTo({
-            center: [message.lon, message.lat],
-            zoom: 17
-        });
-    }else{
-        marker.setLngLat([message.lon, message.lat])
-        map.flyTo({
-            center: [message.lon, message.lat]
+            map.flyTo({
+                center: [message.lon, message.lat],
+                zoom: 17
+            });
+        }else{
+            marker.setLngLat([message.lon, message.lat])
+            map.flyTo({
+                center: [message.lon, message.lat]
+            });
+        }
+        
+        map.getSource('route').setData({
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                type: 'LineString',
+                coordinates: routeCoordinates
+            }
         });
     }
-    
-    map.getSource('route').setData({
-        type: 'Feature',
-        properties: {},
-        geometry: {
-            type: 'LineString',
-            coordinates: routeCoordinates
-        }
-    });
 });
 
 socket.on('data', (data) => {
