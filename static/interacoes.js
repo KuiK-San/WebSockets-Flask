@@ -17,25 +17,41 @@ $(document).ready(() => {
     })
 })
 
+const getDate = () => {
+    dia = new Date()
+    return `${dia.getDate()}/${dia.getMonth() + 1}/${dia.getFullYear()}`
+}
 
 document.querySelector('#dispositivos').addEventListener('change', () =>{
     document.querySelector('#datas').innerHTML = '<option selected disabled>Selecione uma data</option>'
-    document.querySelector('#datas').innerHTML += '<option value="hoje">Hoje</option>'
     $.ajax({
         url: '/api/pega_dias?serial=' + document.querySelector('#dispositivos').value,
         method: 'GET',
         success: (data) => {
-            console.log(data)
             document.querySelector('#datas').style.display = 'inline-block'
             for(let dia in data){
                 let option = document.createElement('option')
-                option.innerText = data[dia]
-                option.value = `rota_${data[dia]}`
+                if(data[dia] == getDate()){
+                    option.innerText = 'Hoje'
+                    option.value = `rota_${getDate()}`
+                }else{
+                    option.innerText = data[dia]
+                    option.value = `rota_${data[dia]}`
+                }
                 document.querySelector('#datas').appendChild(option)
             }
         },
         error: () =>{
-            console.log('marcelo')
+            console.log('ERRO')
         }
+    })
+})
+
+document.querySelector('#datas').addEventListener('change', () => {
+    $.ajax({
+        url: '/api/pegar_rotas?rota=' + document.querySelector('#datas').value + '&serial=' + document.querySelector('#dispositivos').value,
+        method: 'GET',
+        success: '',
+        error: ''
     })
 })

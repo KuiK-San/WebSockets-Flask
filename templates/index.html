@@ -17,10 +17,11 @@
         <option disabled selected>Selecione uma data</option>
     </select>
     <div class="container">
-        <div id="map" class="map" style="width: 1200px; height: 800px; background-color: green;display: block;"></div>
+        <div id="map" class="map" style="width: 1200px; height: 800px; background-color: rgb(207, 207, 207);display: block;"></div>
     </div>
     <p id="count"></p>
     <p id="coord"></p>
+    <script>var worker = new Worker("{{url_for('static', filename='script.js')}}")</script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>

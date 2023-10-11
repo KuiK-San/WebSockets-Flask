@@ -82,7 +82,7 @@ def pega_disp():
     return jsonify(serials)
 
 @app.route('/api/pega_dias')
-def pega_horarios():
+def pega_dias():
     serial = request.args.get('serial')
     doc = collection.find_one({'serial': serial})
 
@@ -92,6 +92,20 @@ def pega_horarios():
         datas.append(str(rota.split('_')[1]))
 
     return jsonify(datas)
+
+@app.route('/api/pegar_rotas')
+def pega_rota():
+    rota = request.args.get('rota')
+    serial = request.args.get('serial')
+
+
+    doc = collection.find_one({'serial': serial})
+
+    if doc and 'rotas' in doc and rota in doc['rotas']:
+        rota_data = doc['rotas'][rota]
+        return jsonify(rota_data)
+    else:
+        return jsonify({"error": "Rota não encontrada"})
 
 if __name__ == "__main__":
     socketio.run(app, host='0.0.0.0', debug=True)

@@ -14,7 +14,7 @@ var marker;
 var routeCoordinates = [];
 
 socket.on('message', (message) => {
-    if(message.serial == document.querySelector('#dispositivos').value){
+    if(message.serial == document.querySelector('#dispositivos').value && document.querySelector('#datas').value == 'rota_' + getDate()){
         coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
         i++;
         document.querySelector('#count').innerHTML = i;
@@ -50,10 +50,6 @@ socket.on('message', (message) => {
     }
 });
 
-socket.on('data', (data) => {
-    console.log(data)
-});
-
 function createCustomMarker() {
     var container = document.createElement('div');
     container.className = 'marker-container';
@@ -70,7 +66,7 @@ function createCustomMarker() {
     return container;
 }
 
-map.on('load', function () {
+map.on('load',  () => {
     map.addSource('route', {
         type: 'geojson',
         data: {
