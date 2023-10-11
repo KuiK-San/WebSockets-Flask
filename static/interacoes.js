@@ -1,3 +1,5 @@
+const limparMapa = new Event('limparMapa')
+
 $(document).ready(() => {
     $.ajax({
         url: '/api/pega_disp',
@@ -45,6 +47,7 @@ document.querySelector('#dispositivos').addEventListener('change', () =>{
             console.log('ERRO')
         }
     })
+    document.dispatchEvent(limparMapa)
 })
 
 document.querySelector('#datas').addEventListener('change', () => {
@@ -54,4 +57,5 @@ document.querySelector('#datas').addEventListener('change', () => {
         success: '',
         error: ''
     })
+    document.dispatchEvent(limparMapa)
 })

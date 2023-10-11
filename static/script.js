@@ -47,6 +47,26 @@ socket.on('message', (message) => {
                 coordinates: routeCoordinates
             }
         });
+
+        document.addEventListener('limparMapa', () => {
+            routeCoordinates = [];
+    
+            // Remover o marcador do mapa, se existir
+            if (marker) {
+                marker.remove();
+                marker = null;
+            }
+        
+            // Atualizar a camada da rota no mapa com coordenadas vazias
+            map.getSource('route').setData({
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'LineString',
+                    coordinates: []
+                }
+            });
+        })
     }
 });
 
@@ -93,3 +113,4 @@ map.on('load',  () => {
         }
     });
 });
+
