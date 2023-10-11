@@ -5,154 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Localizador</title>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="{{url_for('static', filename='pointer.css')}}">
+
 </head>
 <body>
     <h1>Localizador</h1>
+    <select name="dispositivos" id="dispositivos">
+        <option disabled selected>Selecione um dispositivo</option>
+    </select>
+    <select name="datas" id="datas">
+        <option disabled selected>Selecione uma data</option>
+    </select>
     <div class="container">
         <div id="map" class="map" style="width: 1200px; height: 800px; background-color: green;display: block;"></div>
     </div>
     <p id="count"></p>
     <p id="coord"></p>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
-    <script>
-        var i = 0;
-        var socket = io.connect('http://' + document.domain + ":" + location.port);
-        let coords = document.querySelector('#coord');
-        
-        mapboxgl.accessToken = "pk.eyJ1IjoidGhlZ3VpNDAwMCIsImEiOiJjbGtqeXRnNWYwbjlrM2dvYXYxZXVwY2FjIn0.RSEC3oyLBXLiL9ybKmOEIQ"
-        var map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            zoom: -0.5
-        });
+    <script src="{{ url_for('static', filename='script.js')}}"></script>
+    <script src="{{ url_for('static', filename='interacoes.js') }}"></script>
 
-        var marker; 
 
-        var routeCoordinates = [];
-
-        socket.on('message', (message) => {
-            coords.innerHTML += `<span>lat: ${message.lat}, lon: ${message.lon}, horario: ${message.horario} <a target="_blank" href="https://www.google.com/maps/place/${message.lat},${message.lon}">link</a></span></br>`
-            i++;
-            document.querySelector('#count').innerHTML = i;
-
-            routeCoordinates.push([message.lon, message.lat]);
-
-            if (!marker) { 
-                marker = new mapboxgl.Marker({
-                    element: createCustomMarker()
-                })
-                .setLngLat([message.lon, message.lat])
-                .addTo(map);
-
-                map.flyTo({
-                    center: [message.lon, message.lat],
-                    zoom: 17
-                });
-            }else{
-                marker.setLngLat([message.lon, message.lat])
-                map.flyTo({
-                    center: [message.lon, message.lat]
-                });
-            }
-            
-            map.getSource('route').setData({
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                    type: 'LineString',
-                    coordinates: routeCoordinates
-                }
-            });
-        });
-
-        socket.on('data', (data) => {
-            console.log(data)
-        });
-
-        function createCustomMarker() {
-            var container = document.createElement('div');
-            container.className = 'marker-container';
-
-            var pulsatingCircle = document.createElement('div');
-            pulsatingCircle.className = 'pulsating-circle';
-
-            var locationMarker = document.createElement('div');
-            locationMarker.className = 'custom-marker';
-
-            container.appendChild(pulsatingCircle);
-            container.appendChild(locationMarker);
-
-            return container;
-        }
-
-        map.on('load', function () {
-            map.addSource('route', {
-                type: 'geojson',
-                data: {
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: []
-                    }
-                }
-            });
-
-            map.addLayer({
-                id: 'route',
-                type: 'line',
-                source: 'route',
-                layout: {
-                    'line-join': 'round',
-                    'line-cap': 'round'
-                },
-                paint: {
-                    'line-color': '#888',
-                    'line-width': 8
-                }
-            });
-        });
-    </script>
-
-    <style>
-        .marker-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .custom-marker {
-            width: 15px;
-            height: 15px;
-            background-color: blue;
-            border-radius: 50%;
-        }
-
-        .pulsating-circle {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(0, 0, 255, 0.3);
-            border-radius: 50%;
-            animation: pulsate 1.5s infinite;
-        }
-
-        @keyframes pulsate {
-            0% {
-                transform: scale(0.8);
-                opacity: 0.5;
-            }
-            50% {
-                transform: scale(1.2);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(0.8);
-                opacity: 0.5;
-            }
-        }
-    </style>
 </body>
 </html>

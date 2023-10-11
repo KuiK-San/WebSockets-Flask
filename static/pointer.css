@@ -1,0 +1,37 @@
+.marker-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-marker {
+    width: 15px;
+    height: 15px;
+    background-color: blue;
+    border-radius: 50%;
+}
+
+.pulsating-circle {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 255, 0.3);
+    border-radius: 50%;
+    animation: pulsate 1.5s infinite;
+}
+
+@keyframes pulsate {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+}

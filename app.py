@@ -61,11 +61,37 @@ def log():
             'horario': str(horario)
         }}})
 
+    socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario})
+
     return jsonify({"status": "200"})
 
 @app.route('/', methods=['GET'])
 def index():
+
     return render_template('index.html')
+
+@app.route('/api/pega_disp', methods=['GET'])
+def pega_disp():
+    doc = collection.find({})
+
+    serials :dict = {}
+
+    for document in doc:
+        serials[f'{document["perfil"]}'] = document['serial']
+
+    return jsonify(serials)
+
+@app.route('/api/pega_horarios')
+def pega_horarios():
+    serial = request.args.get('serial')
+    doc = collection.find_one({'serial': serial})
+
+    datas :dict = {}
+
+    for i, rota in enumerate(doc['rotas']):
+        datas[f"{rota.split('_')[1]}"] = doc['rotas'][rota]
+
+    return jsonify(datas)
 
 if __name__ == "__main__":
     socketio.run(app, host='0.0.0.0', debug=True)
