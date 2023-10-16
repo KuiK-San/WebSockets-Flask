@@ -33,7 +33,7 @@ def log():
                     str(0):{
                         'lat': float(lat),
                         'lon': float(lon),
-                        'precisão': round(float(data['acc'][0]), 3),
+                        'precisao': round(float(data['acc'][0]), 3),
                         'horario': str(horario)
                     }
                 }
@@ -47,7 +47,7 @@ def log():
         collection.update_one({'serial': serial}, {"$set": {f"rotas.rota_{dia}.{str(0)}": {
             'lat': float(lat),
             'lon': float(lon),
-            'precisão': round(float(data['acc'][0]), 3),
+            'precisao': round(float(data['acc'][0]), 3),
             'horario': str(horario)
         }}})
 
@@ -57,7 +57,7 @@ def log():
         collection.update_one({'serial': serial}, {"$set": {f"rotas.rota_{dia}.{str(quantidade)}": {
             'lat': float(lat),
             'lon': float(lon),
-            'precisão': round(float(data['acc'][0]), 3),
+            'precisao': round(float(data['acc'][0]), 3),
             'horario': str(horario)
         }}})
 

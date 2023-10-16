@@ -1,4 +1,5 @@
 const limparMapa = new Event('limparMapa')
+const getRoute = new Event('getRoute')
 
 $(document).ready(() => {
     $.ajax({
@@ -51,11 +52,6 @@ document.querySelector('#dispositivos').addEventListener('change', () =>{
 })
 
 document.querySelector('#datas').addEventListener('change', () => {
-    $.ajax({
-        url: '/api/pegar_rotas?rota=' + document.querySelector('#datas').value + '&serial=' + document.querySelector('#dispositivos').value,
-        method: 'GET',
-        success: '',
-        error: ''
-    })
+    document.dispatchEvent(getRoute)
     document.dispatchEvent(limparMapa)
 })

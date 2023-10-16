@@ -2,6 +2,8 @@ var i = 0;
 var socket = io.connect('http://' + document.domain + ":" + location.port);
 let coords = document.querySelector('#coord');
 
+
+
 mapboxgl.accessToken = "pk.eyJ1IjoidGhlZ3VpNDAwMCIsImEiOiJjbGtqeXRnNWYwbjlrM2dvYXYxZXVwY2FjIn0.RSEC3oyLBXLiL9ybKmOEIQ"
 var map = new mapboxgl.Map({
     container: 'map',
@@ -51,13 +53,11 @@ socket.on('message', (message) => {
         document.addEventListener('limparMapa', () => {
             routeCoordinates = [];
     
-            // Remover o marcador do mapa, se existir
             if (marker) {
                 marker.remove();
                 marker = null;
             }
         
-            // Atualizar a camada da rota no mapa com coordenadas vazias
             map.getSource('route').setData({
                 type: 'Feature',
                 properties: {},
@@ -66,7 +66,7 @@ socket.on('message', (message) => {
                     coordinates: []
                 }
             });
-        })
+        });
     }
 });
 
@@ -86,7 +86,7 @@ function createCustomMarker() {
     return container;
 }
 
-map.on('load',  () => {
+map.on('load', () => {
     map.addSource('route', {
         type: 'geojson',
         data: {
@@ -114,3 +114,65 @@ map.on('load',  () => {
     });
 });
 
+let allcoords = []
+
+let markersArray = []; // Array para rastrear os marcadores
+
+document.addEventListener('getRoute', () => {
+    
+    // Remova todos os marcadores do mapa
+    for (const marker of markersArray) {
+        marker.remove();
+    }
+    markersArray = []; // Limpe o array de marcadores
+
+    map.getSource('route').setData({
+        type: 'Feature',
+        properties: {},
+        geometry: {
+            type: 'LineString',
+            coordinates: []
+        }
+    });
+
+    $.ajax({
+        url: '/api/pegar_rotas?rota=' + document.querySelector('#datas').value + '&serial=' + document.querySelector('#dispositivos').value,
+        method: 'GET',
+        success: (data) => {
+            let coords = [];
+            for (let point in data) {
+                coords.push([data[point].lon, data[point].lat]);
+
+                const marker = new mapboxgl.Marker({ color: 'red', scale: 0.5 })
+                    .setLngLat([data[point].lon, data[point].lat]);
+                markersArray.push(marker);
+
+                marker.addTo(map);
+            }
+            allcoords.push(routeCoordinates)
+            allcoords.push(coords)
+            const geojsonData = {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'LineString',
+                    coordinates: coords
+                }
+            }
+
+            map.getSource('route').setData(geojsonData);
+
+            const bounds = new mapboxgl.LngLatBounds();
+            coords.forEach(coord => bounds.extend(coord));
+            const center = bounds.getCenter();
+
+            map.flyTo({
+                center: center,
+                zoom: 15
+            });
+        },
+        error: () => {
+            console.log('ERRO AO CAPTURAR ROTA');
+        }
+    });
+});
