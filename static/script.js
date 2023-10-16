@@ -4,8 +4,10 @@ var i = 0;
 var socket = io.connect('http://' + document.domain + ":" + location.port);
 let coordsElement = document.querySelector('#coord');
 let routeCoordinates = [];
+var initialRouteSet
 
 document.addEventListener('getRoute', () => {
+    initialRouteSet = false; 
     routeCoordinates = [];
     for (const marker of markersArray) {
         marker.remove();
@@ -76,12 +78,10 @@ var map = new mapboxgl.Map({
 });
 
 var marker;
-var initialRouteSet = false; // Variável para controlar se a rota inicial foi definida
 
 socket.on('message', (message) => {
     if (message.serial == document.querySelector('#dispositivos').value && document.querySelector('#datas').value == 'rota_' + getDate()) {
         if (!initialRouteSet) {
-            // Defina a rota inicial apenas uma vez
             initialRouteSet = true;
             map.getSource('route').setData({
                 type: 'Feature',
