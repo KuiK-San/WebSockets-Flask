@@ -57,12 +57,11 @@ document.addEventListener('getRoute', () => {
                 center: center,
                 zoom: 12
             });
-            for (let i in allcoords) {
-                for (let j in allcoords[i]) {
-                    let entrar = allcoords[0][i];
-                    routeCoordinates.push(entrar);
-                }
+            for(let i in allcoords[0]){
+                routeCoordinates.push(allcoords[0][i])
+                console.log(allcoords[0][i])
             }
+            console.log(routeCoordinates)
         },
         error: () => {
             console.log('ERRO AO CAPTURAR ROTA');
@@ -81,20 +80,9 @@ var marker;
 
 socket.on('message', (message) => {
     if (message.serial == document.querySelector('#dispositivos').value && document.querySelector('#datas').value == 'rota_' + getDate()) {
-        if (!initialRouteSet) {
-            initialRouteSet = true;
-            map.getSource('route').setData({
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                    type: 'LineString',
-                    coordinates: routeCoordinates
-                }
-            });
-        }
-
+        
         routeCoordinates.push([message.lon, message.lat]);
-        document.querySelector('#coord').innerHTML = routeCoordinates.toString()
+        // document.querySelector('#coord').innerHTML = routeCoordinates.toString()
 
         if (!marker) {
             marker = new mapboxgl.Marker({
@@ -113,6 +101,15 @@ socket.on('message', (message) => {
                 center: [message.lon, message.lat]
             });
         }
+        map.getSource('route').setData({
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                type: 'LineString',
+                coordinates: routeCoordinates
+            }
+        });
+    
 
         console.log(routeCoordinates);
     }
