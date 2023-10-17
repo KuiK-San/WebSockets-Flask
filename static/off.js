@@ -1,3 +1,6 @@
 socket.on('off', (data) => {
-    console.log(data)
+    if(document.querySelector('#dispositivos').value == data.serial ){
+        console.log(data.serial)
+        
+    }
 })

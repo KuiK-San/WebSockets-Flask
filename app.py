@@ -3,7 +3,7 @@ from urllib.parse import parse_qs
 from datetime import datetime
 from conexao import collection
 import threading
-import counter
+# import counter
 import time
 from server import app, socketio
 
@@ -25,6 +25,15 @@ def log():
     dia = data_e_hora_atuais.strftime("%d/%m/%Y")
 
     serial = data['ser'][0]
+
+    doc = collection.find_one({'serial': serial})
+
+    for rota in doc['rotas']:
+        for point in doc['rotas'][rota]:
+            if doc['rotas'][rota][point]['horario_a'] == str(data['time'][0]):
+                print('fora!')
+                return jsonify({"status": "Já salvo no servidor"})
+        
     if not collection.find_one({'serial': serial}): # Caso não exista nenhum documento com a serial requisitada
         document = {
             'serial': str(data['ser'][0]),
@@ -36,7 +45,9 @@ def log():
                         'lat': float(lat),
                         'lon': float(lon),
                         'precisao': round(float(data['acc'][0]), 3),
-                        'horario': str(horario)
+                        'horario_s': str(horario),
+                        'horario_a': data['time'][0],
+                        'provedor': data['prov'][0]
                     }
                 }
             }
@@ -51,7 +62,9 @@ def log():
                 'lat': float(lat),
                 'lon': float(lon),
                 'precisao': round(float(data['acc'][0]), 3),
-                'horario': str(horario)
+                'horario_s': str(horario),
+                'horario_a': data['time'][0],
+                'provedor': data['prov'][0]
             },
             'ultima_att': time.time()
             }})
@@ -64,12 +77,15 @@ def log():
                 'lat': float(lat),
                 'lon': float(lon),
                 'precisao': round(float(data['acc'][0]), 3),
-                'horario': str(horario)
+                'horario_s': str(horario),
+                'horario_a': data['time'][0],
+                'provedor': data['prov'][0]
             },
             'ultima_att': time.time()
         }})
 
     socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario, 'serial': serial})
+    
 
     return jsonify({"status": "200"})
 
@@ -116,5 +132,5 @@ def pega_rota():
         return jsonify({"error": "Rota não encontrada"})
 
 if __name__ == "__main__":
-    contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
+    # contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
     socketio.run(app, host='0.0.0.0', debug=True)

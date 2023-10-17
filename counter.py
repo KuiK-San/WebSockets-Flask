@@ -2,6 +2,7 @@ import time
 from conexao import collection
 from server import socketio
 import datetime
+from flask import jsonify
 
 def contador():
     data_e_hora_atuais = datetime.datetime.now()
@@ -14,8 +15,9 @@ def contador():
         for documento in collection.find():
             ultima_att = documento['ultima_att']
             tempo = time.time() - ultima_att
-            socketio.emit('off', documento)
             if tempo > limite:
+                # print('teste')
+                socketio.emit('off', {'serial': str(documento['serial'])})
                 # Salvar no Banco de dados
                 ultimoPonto = len(documento['rotas'][f'rota_{dia}']) - 1
 
@@ -32,4 +34,13 @@ def contador():
         time.sleep(10)
 
 if __name__ == '__main__':
-    contador()
+    # contador()
+    serial = '2c3dbeb3db2d6b30'
+
+    doc = collection.find_one({'serial': serial})
+
+    for rota in doc['rotas']:
+        for point in doc['rotas'][rota]:
+            print(doc['rotas'][rota][point]['horario_a'])
+                
+    
