@@ -6,7 +6,17 @@ let coordsElement = document.querySelector('#coord');
 let routeCoordinates = [];
 var initialRouteSet
 
-document.addEventListener('getRoute', () => {
+// Inicializando o mapa
+mapboxgl.accessToken = "pk.eyJ1IjoidGhlZ3VpNDAwMCIsImEiOiJjbGtqeXRnNWYwbjlrM2dvYXYxZXVwY2FjIn0.RSEC3oyLBXLiL9ybKmOEIQ";
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    zoom: -0.5
+});
+
+document.addEventListener('getRoute', () => { // Recebe Evento quando o usuario escolhe uma rota
+    
+    // Limpa todo o mapa
     initialRouteSet = false; 
     routeCoordinates = [];
     for (const marker of markersArray) {
@@ -23,6 +33,7 @@ document.addEventListener('getRoute', () => {
         }
     });
 
+    // Solicita rota escolhida pelo usuario ao servidor e plota no mapa 
     $.ajax({
         url: '/api/pegar_rotas?rota=' + document.querySelector('#datas').value + '&serial=' + document.querySelector('#dispositivos').value,
         method: 'GET',
@@ -61,23 +72,16 @@ document.addEventListener('getRoute', () => {
                 routeCoordinates.push(allcoords[0][i])
                 console.log(allcoords[0][i])
             }
-            console.log(routeCoordinates)
+            // console.log(routeCoordinates)
         },
         error: () => {
-            console.log('ERRO AO CAPTURAR ROTA');
+            console.error('ERRO AO CAPTURAR ROTA');
         }
     });
 });
 
-mapboxgl.accessToken = "pk.eyJ1IjoidGhlZ3VpNDAwMCIsImEiOiJjbGtqeXRnNWYwbjlrM2dvYXYxZXVwY2FjIn0.RSEC3oyLBXLiL9ybKmOEIQ";
-var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    zoom: -0.5
-});
-
+// Cria o marcador de localização atual do usuario selecionado
 var marker;
-
 socket.on('message', (message) => {
     if (message.serial == document.querySelector('#dispositivos').value && document.querySelector('#datas').value == 'rota_' + getDate()) {
         
@@ -86,7 +90,21 @@ socket.on('message', (message) => {
 
         if (!marker) {
             marker = new mapboxgl.Marker({
-                element: createCustomMarker()
+                element: () => {
+                    var container = document.createElement('div');
+                    container.className = 'marker-container';
+
+                    var pulsatingCircle = document.createElement('div');
+                    pulsatingCircle.className = 'pulsating-circle';
+
+                    var locationMarker = document.createElement('div');
+                    locationMarker.className = 'custom-marker';
+
+                    container.appendChild(pulsatingCircle);
+                    container.appendChild(locationMarker);
+
+                    return container;
+                }
             })
                 .setLngLat([message.lon, message.lat])
                 .addTo(map);
@@ -115,22 +133,7 @@ socket.on('message', (message) => {
     }
 });
 
-function createCustomMarker() {
-    var container = document.createElement('div');
-    container.className = 'marker-container';
-
-    var pulsatingCircle = document.createElement('div');
-    pulsatingCircle.className = 'pulsating-circle';
-
-    var locationMarker = document.createElement('div');
-    locationMarker.className = 'custom-marker';
-
-    container.appendChild(pulsatingCircle);
-    container.appendChild(locationMarker);
-
-    return container;
-}
-
+// Ao carregar o mapa cria camada da rota
 map.on('load', () => {
     map.addSource('route', {
         type: 'geojson',
