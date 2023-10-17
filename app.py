@@ -1,18 +1,11 @@
-from flask import Flask, request, render_template, jsonify
-from flask import request
-from flask_socketio import SocketIO
+from flask import request, render_template, jsonify
 from urllib.parse import parse_qs
 from datetime import datetime
-from pymongo import MongoClient
-
-# Conectando com o DB
-client = MongoClient('localhost', 27017)
-db = client['localizador']
-collection = db['dispositivos']
-
-# Criando Servidor
-app = Flask(__name__)
-socketio = SocketIO(app)
+from conexao import collection
+import threading
+import counter
+import time
+from server import app, socketio
 
 # Rota padrão
 @app.route('/', methods=['GET'])
@@ -36,6 +29,7 @@ def log():
         document = {
             'serial': str(data['ser'][0]),
             'perfil': data['profile'][0],
+            'ultima_att': time.time(),
             'rotas': {
                 f'rota_{dia}': {
                     str(0):{
@@ -52,28 +46,34 @@ def log():
 
     elif collection.find_one({'serial': serial}) and not f'rota_{dia}' in  collection.find_one({'serial': serial})['rotas']: # Caso exista o documento, mas não exista a rota
         doc = collection.find_one({'serial': serial})
-        collection.update_one({'serial': serial}, {"$set": {f"rotas.rota_{dia}.{str(0)}": {
-            'lat': float(lat),
-            'lon': float(lon),
-            'precisao': round(float(data['acc'][0]), 3),
-            'horario': str(horario)
-        }}})
+        collection.update_one({'serial': serial}, {"$set": {
+            f"rotas.rota_{dia}.{str(0)}": {
+                'lat': float(lat),
+                'lon': float(lon),
+                'precisao': round(float(data['acc'][0]), 3),
+                'horario': str(horario)
+            },
+            'ultima_att': time.time()
+            }})
 
     else: # Caso exista o documento e a rota
         doc = collection.find_one({'serial': serial})
         quantidade = len(doc['rotas'][f'rota_{dia}'])
-        collection.update_one({'serial': serial}, {"$set": {f"rotas.rota_{dia}.{str(quantidade)}": {
-            'lat': float(lat),
-            'lon': float(lon),
-            'precisao': round(float(data['acc'][0]), 3),
-            'horario': str(horario)
-        }}})
+        collection.update_one({'serial': serial}, {"$set": {
+            f"rotas.rota_{dia}.{str(quantidade)}": {
+                'lat': float(lat),
+                'lon': float(lon),
+                'precisao': round(float(data['acc'][0]), 3),
+                'horario': str(horario)
+            },
+            'ultima_att': time.time()
+        }})
 
     socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario, 'serial': serial})
 
     return jsonify({"status": "200"})
 
-# ------------------------------------------------------------- API -------------------------------------------------------------
+""" ------------------------------------------------------------- API ------------------------------------------------------------- """
 
 # Rota para obter json com o nome dos dispositivos e a respectiva serial
 @app.route('/api/pega_disp', methods=['GET'])
@@ -116,4 +116,5 @@ def pega_rota():
         return jsonify({"error": "Rota não encontrada"})
 
 if __name__ == "__main__":
+    contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
     socketio.run(app, host='0.0.0.0', debug=True)
