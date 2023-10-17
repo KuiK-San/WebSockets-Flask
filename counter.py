@@ -31,16 +31,9 @@ def contador():
                     collection.update_one({'_id': documento['_id']}, {"$set": {'ociosidade': {f'rota_{dia}':{str(ultimoPonto): f'{time.strftime("%H:%M:%S", time.gmtime(tempo))}'} }}})
 
 
-        time.sleep(10)
+        time.sleep(60)
+
+socketio.on()
 
 if __name__ == '__main__':
-    # contador()
-    serial = '2c3dbeb3db2d6b30'
-
-    doc = collection.find_one({'serial': serial})
-
-    for rota in doc['rotas']:
-        for point in doc['rotas'][rota]:
-            print(doc['rotas'][rota][point]['horario_a'])
-                
-    
+    contador()

@@ -1,5 +1,6 @@
 const limparMapa = new Event('limparMapa')
 const getRoute = new Event('getRoute')
+const verificarAtividade = new Element('verificarAtv')
 
 $(document).ready(() => {
     $.ajax({
@@ -26,6 +27,7 @@ const getDate = () => {
 }
 
 document.querySelector('#dispositivos').addEventListener('change', () =>{
+    document.dispatchEvent(verificarAtividade)
     document.querySelector('#datas').innerHTML = '<option selected disabled>Selecione uma data</option>'
     $.ajax({
         url: '/api/pega_dias?serial=' + document.querySelector('#dispositivos').value,

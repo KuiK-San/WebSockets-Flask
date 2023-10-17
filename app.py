@@ -3,7 +3,7 @@ from urllib.parse import parse_qs
 from datetime import datetime
 from conexao import collection
 import threading
-# import counter
+import counter
 import time
 from server import app, socketio
 
@@ -130,7 +130,15 @@ def pega_rota():
         return jsonify(rota_data)
     else:
         return jsonify({"error": "Rota não encontrada"})
+    
+# Envia última atividade do usuario
+@app.route('/api/pega_atv', methods=['GET'])
+def pega_atv():
+    serial = request.args.get('serial')
+    doc = collection.find_one({'serial': serial})
+
+    return jsonify({'atividade': doc['ultima_att']})
 
 if __name__ == "__main__":
-    # contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
+    contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
     socketio.run(app, host='0.0.0.0', debug=True)
