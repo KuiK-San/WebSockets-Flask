@@ -90,21 +90,7 @@ socket.on('message', (message) => {
 
         if (!marker) {
             marker = new mapboxgl.Marker({
-                element: () => {
-                    var container = document.createElement('div');
-                    container.className = 'marker-container';
-
-                    var pulsatingCircle = document.createElement('div');
-                    pulsatingCircle.className = 'pulsating-circle';
-
-                    var locationMarker = document.createElement('div');
-                    locationMarker.className = 'custom-marker';
-
-                    container.appendChild(pulsatingCircle);
-                    container.appendChild(locationMarker);
-
-                    return container;
-                }
+                element: createMaker()
             })
                 .setLngLat([message.lon, message.lat])
                 .addTo(map);
@@ -132,6 +118,24 @@ socket.on('message', (message) => {
         console.log(routeCoordinates);
     }
 });
+
+function createMaker(){
+    
+    var container = document.createElement('div');
+    container.className = 'marker-container';
+
+    var pulsatingCircle = document.createElement('div');
+    pulsatingCircle.className = 'pulsating-circle';
+
+    var locationMarker = document.createElement('div');
+    locationMarker.className = 'custom-marker';
+
+    container.appendChild(pulsatingCircle);
+    container.appendChild(locationMarker);
+
+    return container;
+
+}
 
 // Ao carregar o mapa cria camada da rota
 map.on('load', () => {
