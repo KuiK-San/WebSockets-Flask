@@ -6,24 +6,43 @@
     <title>Localizador</title>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="{{url_for('static', filename='pointer.css')}}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
 </head>
 <body>
-    <h1>Localizador</h1>
-    <select name="dispositivos" id="dispositivos">
-        <option disabled selected>Selecione um dispositivo</option>
-    </select>
-    <select name="datas" id="datas" style="display: none;">
-        <option disabled selected>Selecione uma data</option>
-    </select>
-    <p id="offline" style="display: none;">O usuario está offline no momento</p>
-    <p id="acc" style="display: none;"></p>
-    <div class="container">
-        <div id="map" class="map" style="width: 1200px; height: 800px; background-color: rgb(207, 207, 207);display: block;"></div>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid justify-content-center">
+          <h1 class="navbar-brand mb-0 h1 justify-content-center">Localizador</h1>
+        </div>
+      </nav>
+    
+    <div class="container mt-3 justify-content-center">
+        <div class="mb-3">
+            <div class="col-12 row flex-wrap gap-1">
+                <div class="col-md-3 col-sm-12">
+                    <select class="form-select "  name="dispositivos" id="dispositivos">
+                        <option disabled selected >Selecione um dispositivo</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-12">
+                    <select  class="form-select " name="datas" id="datas" style="display: none;">
+                        <option disabled selected >Selecione uma data</option>
+                    </select>
+                </div>
+                <p class="col-md-3 col-sm-11bg-light border border-black text-start text-wrap p-2 rounded-2" id="acc" class="alert" style="display: none;"></p>
+            </div>
+        </div>
+        <div class="" id="offline">
+        </div>
+        <div id="map" class="map" style="height: 750px; background-color: rgb(207, 207, 207);display: block;"></div>
+        <p id="count"></p>
+        <p id="coord"></p>
     </div>
-    <p id="count"></p>
-    <p id="coord"></p>
-    <script>var worker = new Worker("{{url_for('static', filename='script.js')}}")</script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        var worker = new Worker("{{url_for('static', filename='script.js')}}")
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>

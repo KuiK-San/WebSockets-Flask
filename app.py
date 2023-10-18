@@ -24,15 +24,16 @@ def log():
     horario = data_e_hora_atuais.strftime("%H:%M:%S %d/%m/%Y")
     dia = data_e_hora_atuais.strftime("%d/%m/%Y")
 
-    serial = '1231231123123123'
+    serial = data['ser'][0]
 
-    doc = collection.find_one({'serial': serial})
+    if collection.find_one({'serial': serial}):
+        doc = collection.find_one({'serial': serial})
 
-    for rota in doc['rotas']:
-        for point in doc['rotas'][rota]:
-            if doc['rotas'][rota][point]['horario_a'] == str(data['time'][0]):
-                print('fora!')
-                return jsonify({"status": "Já salvo no servidor"})
+        for rota in doc['rotas']:
+            for point in doc['rotas'][rota]:
+                if doc['rotas'][rota][point]['horario_a'] == str(data['time'][0]):
+                    print('fora!')
+                    return jsonify({"status": "Já salvo no servidor"})
         
     if not collection.find_one({'serial': serial}): # Caso não exista nenhum documento com a serial requisitada
         document = {
