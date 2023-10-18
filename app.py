@@ -18,13 +18,13 @@ def log():
     data = request.data
     dt_str = data.decode('utf-8')
     data = parse_qs(dt_str)
-    lat = round(float(data['lat'][0]), 6)
-    lon = round(float(data['lon'][0]), 6)
+    lat = float(data['lat'][0])
+    lon = float(data['lon'][0])
     data_e_hora_atuais = datetime.now()
     horario = data_e_hora_atuais.strftime("%H:%M:%S %d/%m/%Y")
     dia = data_e_hora_atuais.strftime("%d/%m/%Y")
 
-    serial = data['ser'][0]
+    serial = '1231231123123123'
 
     doc = collection.find_one({'serial': serial})
 
@@ -84,7 +84,7 @@ def log():
             'ultima_att': time.time()
         }})
 
-    socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario, 'serial': serial})
+    socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario, 'serial': serial, 'precisao': round(float(data['acc'][0]), 3)})
     
 
     return jsonify({"status": "200"})
@@ -136,8 +136,12 @@ def pega_rota():
 def pega_atv():
     serial = request.args.get('serial')
     doc = collection.find_one({'serial': serial})
+    tempo = time.time() - doc['ultima_att']
 
-    return jsonify({'atividade': doc['ultima_att']})
+    atv = time.strftime("%H:%M:%S", time.gmtime(tempo))
+
+    return jsonify({'atividade': atv})
+    
 
 if __name__ == "__main__":
     contador_thread = threading.Thread(target=counter.contador, daemon=True).start()

@@ -148,6 +148,9 @@ socket.on('message', (message) => {
             });
         })
         //console.log(routeCoordinates);
+
+        document.querySelector('#acc').innerHTML = `Precisão de ${message.precisao} metros`
+        document.querySelector('#acc').style.display = `inline`
     }
 });
 
@@ -158,6 +161,7 @@ function createMaker(){
 
     var pulsatingCircle = document.createElement('div');
     pulsatingCircle.className = 'pulsating-circle';
+    pulsatingCircle.id = 'circuloAtual'
 
     var locationMarker = document.createElement('div');
     locationMarker.className = 'custom-marker';

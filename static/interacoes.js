@@ -1,6 +1,6 @@
 const limparMapa = new Event('limparMapa')
 const getRoute = new Event('getRoute')
-const verificarAtividade = new Element('verificarAtv')
+const verificarAtividade = new Event('verificarAtv')
 
 $(document).ready(() => {
     $.ajax({
@@ -54,6 +54,7 @@ document.querySelector('#dispositivos').addEventListener('change', () =>{
 })
 
 document.querySelector('#datas').addEventListener('change', () => {
+    document.dispatchEvent(verificarAtividade)
     document.dispatchEvent(getRoute)
     document.dispatchEvent(limparMapa)
 })

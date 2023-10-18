@@ -19,21 +19,21 @@ def contador():
                 # print('teste')
                 socketio.emit('off', {'serial': str(documento['serial'])})
                 # Salvar no Banco de dados
-                ultimoPonto = len(documento['rotas'][f'rota_{dia}']) - 1
+                if f'rota_{dia}' in documento['rotas']:
+                    ultimoPonto = len(documento['rotas'][f'rota_{dia}']) - 1
 
-                if 'ociosidade' in documento and f'rota_{dia}': # Se tiver rota e ociosidade
-                    collection.update_one({'_id': documento['_id']}, {"$set": {f'ociosidade.rota_{dia}.{ultimoPonto}': f'{time.strftime("%H:%M:%S", time.gmtime(tempo))}'} })
+                    if 'ociosidade' in documento and f'rota_{dia}': # Se tiver rota e ociosidade
+                        collection.update_one({'_id': documento['_id']}, {"$set": {f'ociosidade.rota_{dia}.{ultimoPonto}': f'{time.strftime("%H:%M:%S", time.gmtime(tempo))}'} })
 
-                elif 'ociosidade' in documento: # Se não tiver rota mas tiver ociosidade
-                    collection.update_one({'_id': documento['_id']}, {"$set": {f'ociosidade.rota_{dia}': {str(ultimoPonto): f'{time.strftime("%H:%M:%S", time.gmtime(tempo))}'} }})
+                    elif 'ociosidade' in documento: # Se não tiver rota mas tiver ociosidade
+                        collection.update_one({'_id': documento['_id']}, {"$set": {f'ociosidade.rota_{dia}': {str(ultimoPonto): f'{time.strftime("%H:%M:%S", time.gmtime(tempo))}'} }})
 
-                else: # Se não tiver nenhum dos dois
-                    collection.update_one({'_id': documento['_id']}, {"$set": {'ociosidade': {f'rota_{dia}':{str(ultimoPonto): f'{time.strftime("%H:%M:%S", time.gmtime(tempo))}'} }}})
+                    else: # Se não tiver nenhum dos dois
+                        collection.update_one({'_id': documento['_id']}, {"$set": {'ociosidade': {f'rota_{dia}':{str(ultimoPonto): f'{time.strftime("%H:%M:%S", time.gmtime(tempo))}'} }}})
 
 
         time.sleep(60)
 
-socketio.on()
 
 if __name__ == '__main__':
     contador()
