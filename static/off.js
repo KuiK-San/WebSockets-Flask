@@ -1,7 +1,8 @@
 // var offline = document.querySelector('#offline')
 const remover = new Event('remover')
 const alertPlaceholder = document.getElementById('offline')
-const appendAlert = (message, type) => {
+
+const makeAlert = (message, type) => { // Função para excluir alerta atual (se exibido) e adicionar um com a nova mensagem
     const wrapper = document.createElement('div')
     
     if(type === 'warning'){
@@ -21,27 +22,27 @@ const appendAlert = (message, type) => {
     alertPlaceholder.innerHTML = ''
     alertPlaceholder.append(wrapper)
 }
-const excludeAlert = () => {
+const excludeAlert = () => { // Função que exclui alerta atual
     alertPlaceholder.innerHTML = ''
 }
-const getAtt = (serial, type) => {
+const getAtt = (serial, type) => { // função que pega a ultima atividade do usuario e cria um alerta
     $.ajax({
             
         url: `/api/pega_atv?serial=${serial}`,
         method: 'GET',
         success: (data) => {
-            appendAlert(`Última atualização do usúario há ${data.atividade}`, type)
+            makeAlert(`Última atualização do usúario há ${data.atividade}`, type)
         },
         error: () => {
             console.log('ERRO')
         }
     })
 }
-const excludeAtt = () => {
+const excludeAtt = () => { // Função que exclui a precisão da página
     document.querySelector('#acc').innerHTML = ''
     document.querySelector('#acc').style.display = 'none'
 }
-socket.on('off', (data) => {
+socket.on('off', (data) => { // Função quando recebe que o usuario está offline
     if(document.querySelector('#dispositivos').value == data.serial && document.querySelector('#datas').value == 'rota_' + getDate()){
         getAtt(document.querySelector('#dispositivos').value, 'danger')
         excludeAtt()
@@ -53,7 +54,7 @@ socket.on('off', (data) => {
         excludeAlert()
     }
 })
-socket.on('message', (data) => {
+socket.on('message', (data) => { // Função que recebe que o usuario atualizou
     if(document.querySelector('#dispositivos').value == data.serial ){
         excludeAlert()
         document.querySelector('#circuloAtual').classList.add('pulsating-circle')
@@ -63,7 +64,7 @@ socket.on('message', (data) => {
         
     }
 })
-document.addEventListener('verificarAtv', () => {
+document.addEventListener('verificarAtv', () => { // Função que para verificar a ultima atulização do usuario e cria um alert
     if(document.querySelector('#datas').value == 'rota_' + getDate()){
         getAtt(document.querySelector('#dispositivos').value, 'warning')
     }
@@ -71,6 +72,6 @@ document.addEventListener('verificarAtv', () => {
         excludeAlert()
     }
 })
-document.querySelector('#dispositivos').addEventListener('change', () => {
+document.querySelector('#dispositivos').addEventListener('change', () => { // Função que exclui os alertas quando o usuario muda o dispositivo selecionado
     excludeAlert()
 } )

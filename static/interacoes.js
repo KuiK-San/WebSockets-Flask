@@ -2,6 +2,7 @@ const limparMapa = new Event('limparMapa')
 const getRoute = new Event('getRoute')
 const verificarAtividade = new Event('verificarAtv')
 
+/* ----------------------------- Criador de options ----------------------------- */
 $(document).ready(() => {
     $.ajax({
         url: '/api/pega_disp',
@@ -26,6 +27,7 @@ const getDate = () => {
     return `${dia.getDate()}/${dia.getMonth() + 1}/${dia.getFullYear()}`
 }
 
+/* ----------------------------- Modificador quando mexe no dispositivo ----------------------------- */
 document.querySelector('#dispositivos').addEventListener('change', () =>{
 
     document.querySelector('#datas').innerHTML = '<option selected disabled>Selecione uma data</option>'
@@ -53,8 +55,10 @@ document.querySelector('#dispositivos').addEventListener('change', () =>{
     document.dispatchEvent(limparMapa)
 })
 
+/* ----------------------------- diparador de eventos para quando mexe na data ----------------------------- */
 document.querySelector('#datas').addEventListener('change', () => {
     document.dispatchEvent(verificarAtividade)
     document.dispatchEvent(getRoute)
     document.dispatchEvent(limparMapa)
 })
+
