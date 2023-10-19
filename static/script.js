@@ -23,7 +23,7 @@ document.addEventListener('getRoute', () => { // Recebe Evento quando o usuario 
         marker.remove();
     }
     markersArray = [];
-
+    
     map.getSource('route').setData({
         type: 'Feature',
         properties: {},
@@ -32,7 +32,7 @@ document.addEventListener('getRoute', () => { // Recebe Evento quando o usuario 
             coordinates: []
         }
     });
-
+    
     // Solicita rota escolhida pelo usuario ao servidor e plota no mapa 
     $.ajax({
         url: '/api/pegar_rotas?rota=' + document.querySelector('#datas').value + '&serial=' + document.querySelector('#dispositivos').value,
@@ -42,14 +42,14 @@ document.addEventListener('getRoute', () => { // Recebe Evento quando o usuario 
             coordArray.sort((a, b) => new Date(a.horario_a) - new Date(b.horario_a));
             
             let coords = [];
-
+            
             for (let point of coordArray) {
                 coords.push([point.lon, point.lat]);
-
+                
                 const marker = new mapboxgl.Marker({ color: 'red', scale: 0.5 })
-                    .setLngLat([point.lon, point.lat]);
+                .setLngLat([point.lon, point.lat]);
                 markersArray.push(marker); 
-
+                
                 marker.addTo(map);
             }
             allcoords.push(coords);
@@ -61,13 +61,13 @@ document.addEventListener('getRoute', () => { // Recebe Evento quando o usuario 
                     coordinates: coords
                 }
             };
-
+            
             map.getSource('route').setData(geojsonData);
-
+            
             const bounds = new mapboxgl.LngLatBounds();
             coords.forEach(coord => bounds.extend(coord));
             const center = bounds.getCenter();
-
+            
             map.flyTo({
                 center: center,
                 zoom: 12
@@ -94,7 +94,7 @@ socket.on('message', (message) => {
         if(lat != null && lon != null){
             // console.log('criador de posição')
             const ultimaPos = new mapboxgl.Marker({ color: 'red', scale: 0.5 })
-                        .setLngLat([lon, lat])
+            .setLngLat([lon, lat])
             ultimaPos.addTo(map)
             markersArray.push(ultimaPos)
         }
@@ -103,52 +103,52 @@ socket.on('message', (message) => {
         
         routeCoordinates.push([message.lon, message.lat]);
         // document.querySelector('#coord').innerHTML = routeCoordinates.toString()
-
+        
         if (!marker) {
             marker = new mapboxgl.Marker({
                 element: createMaker()
             })
                 .setLngLat([message.lon, message.lat])
                 .addTo(map);
-
-            map.flyTo({
-                center: [message.lon, message.lat],
-                zoom: 17
-            });
-        } else {
-            marker.setLngLat([message.lon, message.lat]);
-            map.flyTo({
-                center: [message.lon, message.lat]
-            });
-        }
-        map.getSource('route').setData({
-            type: 'Feature',
-            properties: {},
-            geometry: {
-                type: 'LineString',
-                coordinates: routeCoordinates
+                
+                map.flyTo({
+                    center: [message.lon, message.lat],
+                    zoom: 17
+                });
+            } else {
+                marker.setLngLat([message.lon, message.lat]);
+                map.flyTo({
+                    center: [message.lon, message.lat]
+                });
             }
-        });
-    
-        document.addEventListener('limparMapa', () => {
-            initialRouteSet = false; 
-            routeCoordinates = [];
-            for (const marker of markersArray) {
-                marker.remove();
-            }
-            markersArray = [];
-
             map.getSource('route').setData({
                 type: 'Feature',
                 properties: {},
                 geometry: {
+                    type: 'LineString',
+                    coordinates: routeCoordinates
+                }
+            });
+            
+            document.addEventListener('limparMapa', () => {
+                initialRouteSet = false; 
+                routeCoordinates = [];
+                for (const marker of markersArray) {
+                    marker.remove();
+                }
+                markersArray = [];
+                
+                map.getSource('route').setData({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
                     type: 'LineString',
                     coordinates: []
                 }
             });
         })
         //console.log(routeCoordinates);
-
+        
         document.querySelector('#acc').innerHTML = `Precisão de ${message.precisao} metros`
         document.querySelector('#acc').style.display = `inline`
     }
@@ -158,19 +158,19 @@ function createMaker(){
     
     var container = document.createElement('div');
     container.className = 'marker-container';
-
+    
     var pulsatingCircle = document.createElement('div');
     pulsatingCircle.className = 'pulsating-circle';
     pulsatingCircle.id = 'circuloAtual'
-
+    
     var locationMarker = document.createElement('div');
     locationMarker.className = 'custom-marker';
-
+    
     container.appendChild(pulsatingCircle);
     container.appendChild(locationMarker);
-
+    
     return container;
-
+    
 }
 
 // Ao carregar o mapa cria camada da rota
@@ -186,7 +186,7 @@ map.on('load', () => {
             }
         }
     });
-
+    
     map.addLayer({
         id: 'route',
         type: 'line',
@@ -201,3 +201,31 @@ map.on('load', () => {
         }
     });
 });
+
+/* ----------------------------- Mudar para pontos ou apenas rota ----------------------------- */
+var pontos = true
+
+document.addEventListener('changePts', () => {
+    let pontosON = document.querySelector('#pontos-on')
+    let pontosOFF = document.querySelector('#pontos-off')
+    
+    if(pontosON.classList.contains('active')){
+        if(!pontos){
+            // console.log('com pontos')
+            for(marker in markersArray){
+                markersArray[marker].addTo(map)
+            }
+        }
+        pontos = true
+    }else if(pontosOFF.classList.contains('active')){
+        if(pontos){
+            for(marker in markersArray){
+                markersArray[marker].remove()
+            }
+            // console.log('sem pontos')
+        }
+        pontos = false
+    }
+
+
+})

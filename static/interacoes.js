@@ -1,6 +1,7 @@
 const limparMapa = new Event('limparMapa')
 const getRoute = new Event('getRoute')
 const verificarAtividade = new Event('verificarAtv')
+const changePts = new Event('changePts')
 
 /* ----------------------------- Criador de options ----------------------------- */
 $(document).ready(() => {
@@ -53,12 +54,43 @@ document.querySelector('#dispositivos').addEventListener('change', () =>{
         }
     })
     document.dispatchEvent(limparMapa)
+    document.querySelector('#changer').classList.add('d-none')
 })
 
-/* ----------------------------- diparador de eventos para quando mexe na data ----------------------------- */
+/* ----------------------------- disparador de eventos para quando mexe na data ----------------------------- */
 document.querySelector('#datas').addEventListener('change', () => {
     document.dispatchEvent(verificarAtividade)
     document.dispatchEvent(getRoute)
     document.dispatchEvent(limparMapa)
+    document.querySelector('#changer').classList.remove('d-none')
+    
 })
 
+/* ----------------------------- Botões Para definir Se terá ou não os Pontos ----------------------------- */
+
+document.querySelector('#pontos-on').addEventListener('click', () => {
+    let pontosON = document.querySelector('#pontos-on')
+    let pontosOFF = document.querySelector('#pontos-off')
+
+    if(!pontosON.classList.contains('active')){
+        pontosON.classList.toggle('active')
+        pontosOFF.classList.toggle('active')
+        
+    }
+
+    document.dispatchEvent(changePts)
+
+})
+
+document.querySelector('#pontos-off').addEventListener('click', () => {
+    let pontosON = document.querySelector('#pontos-on')
+    let pontosOFF = document.querySelector('#pontos-off')
+
+    if(!pontosOFF.classList.contains('active')){
+        pontosOFF.classList.toggle('active')
+        pontosON.classList.toggle('active')
+    }
+
+    document.dispatchEvent(changePts)
+
+})
