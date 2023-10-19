@@ -57,6 +57,7 @@ document.addEventListener("getRoute", () => {
 
             for (let point of coordArray) {
                 coords.push([point.lon, point.lat]);
+                console.log(point)
 
                 const marker = new mapboxgl.Marker({
                     element: createMaker('default', point)
@@ -204,7 +205,9 @@ function createMaker(type="location", data={}) {
         }
         container.setAttribute('data-bs-toggle','modal')
         container.setAttribute('data-bs-target','#pop-up')
-        
+        container.setAttribute('data-route', document.querySelector('#datas').value)
+        container.setAttribute('data-point', document.querySelector('#datas').value)
+
         return container
     }
 }
