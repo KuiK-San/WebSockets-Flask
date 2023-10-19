@@ -49,8 +49,9 @@ document.addEventListener('getRoute', () => { // Recebe Evento quando o usuario 
                 const marker = new mapboxgl.Marker({ color: 'red', scale: 0.5 })
                 .setLngLat([point.lon, point.lat]);
                 markersArray.push(marker); 
-                
-                marker.addTo(map);
+                if(pontos){
+                    marker.addTo(map);
+                }
             }
             allcoords.push(coords);
             const geojsonData = {
@@ -95,7 +96,10 @@ socket.on('message', (message) => {
             // console.log('criador de posição')
             const ultimaPos = new mapboxgl.Marker({ color: 'red', scale: 0.5 })
             .setLngLat([lon, lat])
-            ultimaPos.addTo(map)
+            if(pontos){
+
+                ultimaPos.addTo(map)
+            }
             markersArray.push(ultimaPos)
         }
         lat = parseFloat(message.lat)
