@@ -4,9 +4,20 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Localizador</title>
-        <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
-        <link rel="stylesheet" href="{{url_for('static', filename='pointer.css')}}" />
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+        <link
+            href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="{{url_for('static', filename='pointer.css')}}"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
     </head>
     <body>
         <nav class="navbar bg-body-tertiary">
@@ -21,33 +32,100 @@
             <div class="mb-3">
                 <div class="col-12 row flex-wrap gap-1">
                     <div class="col-md-3 col-sm-12">
-                        <select class="form-select" name="dispositivos" id="dispositivos">
+                        <select
+                            class="form-select"
+                            name="dispositivos"
+                            id="dispositivos"
+                        >
                             <option disabled selected>
                                 Selecione um dispositivo
                             </option>
                         </select>
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <select class="form-select" name="datas" id="datas" style="display: none">
+                        <select
+                            class="form-select"
+                            name="datas"
+                            id="datas"
+                            style="display: none"
+                        >
                             <option disabled selected>
                                 Selecione uma data
                             </option>
                         </select>
                     </div>
-                    <p class="col-md-3 col-sm-11bg-light border border-black text-start text-wrap p-2 rounded-2" id="acc" class="alert" style="display: none" ></p>
+                    <p
+                        class="col-md-3 col-sm-11bg-light border border-black text-start text-wrap p-2 rounded-2"
+                        id="acc"
+                        class="alert"
+                        style="display: none"
+                    ></p>
                 </div>
                 <div id="changer" class="btn-group mt-2 d-none">
-                    <a href="#" id="pontos-on" class="btn btn-secondary active">Com Pontos</a>
-                    <a href="#" id="pontos-off" class="btn btn-secondary">Apenas Rota</a>
+                    <a href="#" id="pontos-on" class="btn btn-secondary active"
+                        >Com Pontos</a
+                    >
+                    <a href="#" id="pontos-off" class="btn btn-secondary"
+                        >Apenas Rota</a
+                    >
                 </div>
             </div>
             <div class="" id="offline"></div>
-            <div id="map" class="map" style=" height: 750px; background-color: rgb(207, 207, 207); display: block; " ></div>
+            <div
+                id="map"
+                class="map"
+                style="
+                    height: 750px;
+                    background-color: rgb(207, 207, 207);
+                    display: block;
+                "
+            ></div>
             <p id="count"></p>
             <p id="coord"></p>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous" ></script>
+        <div
+            class="modal fade"
+            id="pop-up"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">
+                            Modal title
+                        </h1>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">...</div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"
+        ></script>
         <script>
             var worker = new Worker(
                 "{{url_for('static', filename='script.js')}}"

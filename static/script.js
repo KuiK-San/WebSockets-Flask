@@ -59,8 +59,7 @@ document.addEventListener("getRoute", () => {
                 coords.push([point.lon, point.lat]);
 
                 const marker = new mapboxgl.Marker({
-                    color: "red",
-                    scale: 0.5,
+                    element: createMaker('default', point)
                 }).setLngLat([point.lon, point.lat]);
                 markersArray.push(marker);
                 if (pontos) {
@@ -85,7 +84,7 @@ document.addEventListener("getRoute", () => {
 
             map.flyTo({
                 center: center,
-                zoom: 12,
+                zoom: 13,
             });
             for (let i in allcoords[0]) {
                 routeCoordinates.push(allcoords[0][i]);
@@ -113,8 +112,7 @@ socket.on("message", (message) => {
         if (lat != null && lon != null) {
             // console.log('criador de posição')
             const ultimaPos = new mapboxgl.Marker({
-                color: "red",
-                scale: 0.5,
+                element: createMaker('default', {})
             }).setLngLat([lon, lat]);
             if (pontos) {
                 ultimaPos.addTo(map);
@@ -179,22 +177,38 @@ socket.on("message", (message) => {
     }
 });
 
-function createMaker() {
-    var container = document.createElement("div");
-    container.className = "marker-container";
+function createMaker(type="location", data={}) {
+    if(type === 'location'){
+        let container = document.createElement("div");
+        container.className = "marker-container";
+    
+        let pulsatingCircle = document.createElement("div");
+        pulsatingCircle.className = "pulsating-circle";
+        pulsatingCircle.id = "circuloAtual";
+    
+        let locationMarker = document.createElement("div");
+        locationMarker.className = "custom-marker";
+    
+        container.appendChild(pulsatingCircle);
+        container.appendChild(locationMarker);
+    
+        return container;
 
-    var pulsatingCircle = document.createElement("div");
-    pulsatingCircle.className = "pulsating-circle";
-    pulsatingCircle.id = "circuloAtual";
-
-    var locationMarker = document.createElement("div");
-    locationMarker.className = "custom-marker";
-
-    container.appendChild(pulsatingCircle);
-    container.appendChild(locationMarker);
-
-    return container;
+    }
+    if(type === 'default'){
+        let container = document.createElement('div')
+        container.className = 'marker-container'
+        container.className = 'marker'
+        container.onclick = () => {
+            console.log(data)
+        }
+        container.setAttribute('data-bs-toggle','modal')
+        container.setAttribute('data-bs-target','#pop-up')
+        
+        return container
+    }
 }
+
 
 // Ao carregar o mapa cria camada da rota
 map.on("load", () => {
@@ -219,6 +233,7 @@ map.on("load", () => {
             "line-cap": "round",
         },
         paint: {
+            "line-opacity": 0.8,
             "line-color": "#888",
             "line-width": 8,
         },

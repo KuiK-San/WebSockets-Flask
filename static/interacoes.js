@@ -94,3 +94,11 @@ document.querySelector('#pontos-off').addEventListener('click', () => {
     document.dispatchEvent(changePts)
 
 })
+
+const markers = document.querySelectorAll('#marcador')
+
+markers.forEach((marker) => {
+    marker.addEventListener('click', () => {
+        console.log('marcelo')
+    })
+})
