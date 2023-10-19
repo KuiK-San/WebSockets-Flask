@@ -34,6 +34,10 @@ document.addEventListener("getRoute", () => {
             coordinates: [],
         },
     });
+    if(marker){
+        marker.remove()
+        marker = null
+    }
 
     // Solicita rota escolhida pelo usuario ao servidor e plota no mapa
     $.ajax({
@@ -231,15 +235,15 @@ document.addEventListener("changePts", () => {
     if (pontosON.classList.contains("active")) {
         if (!pontos) {
             // console.log('com pontos')
-            for (marker in markersArray) {
-                markersArray[marker].addTo(map);
+            for (marcador in markersArray) {
+                markersArray[marcador].addTo(map);
             }
         }
         pontos = true;
     } else if (pontosOFF.classList.contains("active")) {
         if (pontos) {
-            for (marker in markersArray) {
-                markersArray[marker].remove();
+            for (marcador in markersArray) {
+                markersArray[marcador].remove();
             }
             // console.log('sem pontos')
         }
