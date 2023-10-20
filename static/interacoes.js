@@ -109,7 +109,7 @@ if (modal) {
             url: `api/pega_pt?serial=${serial}&rota=${rota}&ponto=${ponto}`,
             method: 'GET',
             success: (data) => {
-                modal.querySelector('#modalBody').innerHTML = '<p id="end"><span class="fw-bolder">Endereço não encontrado</span></p>'
+                modal.querySelector('#modalBody').innerHTML = '<p id="end"><span class="fw-bolder">Buscando endereço...</span></p>'
                 const create = (label, conteudo, type=false) =>{
                     if(type){
                         conteudo = new Date(conteudo)
@@ -134,22 +134,28 @@ if (modal) {
 
                 }
                 
+                let end = document.querySelector('#end')
                 fetch(`https://nominatim.openstreetmap.org/reverse?lat=${data.lat}&lon=${data.lon}&format=json`)
                     .then((res) => {
                         if(!res.ok){
+                            end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
                             throw new Error('Não foi possivel acessar a API')
+                            
                         }
                         return res.json()
                     })
                     .then((data) => {
                         if('road' in data.address){
-                            let end = document.querySelector('#end')
                             let endereco = data.address.road
                             
                             end.innerHTML = '<span class="fw-bolder">Endereço: </span>' + endereco
+                        }else{
+                            end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
+                            
                         }
                     })
                     .catch(e => {
+                        end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
                         console.error(e)
                     })
                 
