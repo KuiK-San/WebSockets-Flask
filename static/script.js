@@ -5,6 +5,7 @@ var socket = io.connect("http://" + document.domain + ":" + location.port);
 let coordsElement = document.querySelector("#coord");
 let routeCoordinates = [];
 var initialRouteSet;
+var totalPts = 0
 
 // Inicializando o mapa
 mapboxgl.accessToken =
@@ -21,6 +22,7 @@ document.addEventListener("getRoute", () => {
     // Limpa todo o mapa
     initialRouteSet = false;
     routeCoordinates = [];
+    totalPts = 0
     for (const marker of markersArray) {
         marker.remove();
     }
@@ -54,18 +56,20 @@ document.addEventListener("getRoute", () => {
             );
 
             let coords = [];
-
+            
             for (let point of coordArray) {
+                
                 coords.push([point.lon, point.lat]);
-                console.log(point)
+                // console.log(point)
 
                 const marker = new mapboxgl.Marker({
-                    element: createMaker('default', point)
+                    element: createMaker('default', totalPts++)
                 }).setLngLat([point.lon, point.lat]);
                 markersArray.push(marker);
                 if (pontos) {
                     marker.addTo(map);
                 }
+                
             }
             allcoords.push(coords);
             const geojsonData = {
@@ -113,7 +117,7 @@ socket.on("message", (message) => {
         if (lat != null && lon != null) {
             // console.log('criador de posição')
             const ultimaPos = new mapboxgl.Marker({
-                element: createMaker('default', {})
+                element: createMaker('default', totalPts++)
             }).setLngLat([lon, lat]);
             if (pontos) {
                 ultimaPos.addTo(map);
@@ -155,6 +159,7 @@ socket.on("message", (message) => {
         document.addEventListener("limparMapa", () => {
             initialRouteSet = false;
             routeCoordinates = [];
+            totalPts = 0
             for (const marker of markersArray) {
                 marker.remove();
             }
@@ -178,7 +183,7 @@ socket.on("message", (message) => {
     }
 });
 
-function createMaker(type="location", data={}) {
+function createMaker(type="location", pts=0) {
     if(type === 'location'){
         let container = document.createElement("div");
         container.className = "marker-container";
@@ -200,13 +205,12 @@ function createMaker(type="location", data={}) {
         let container = document.createElement('div')
         container.className = 'marker-container'
         container.className = 'marker'
-        container.onclick = () => {
-            console.log(data)
-        }
         container.setAttribute('data-bs-toggle','modal')
         container.setAttribute('data-bs-target','#pop-up')
-        container.setAttribute('data-route', document.querySelector('#datas').value)
-        container.setAttribute('data-point', document.querySelector('#datas').value)
+        container.setAttribute('data-point', pts)
+        container.onclick = () => {
+            
+        }
 
         return container
     }

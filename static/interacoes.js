@@ -95,10 +95,78 @@ document.querySelector('#pontos-off').addEventListener('click', () => {
 
 })
 
-const markers = document.querySelectorAll('#marcador')
+/* ----------------------------- Eventos do Modal ----------------------------- */
+const modal = document.getElementById('pop-up')
+if (modal) {
+    modal.addEventListener('show.bs.modal', event => {
+        const marcador = event.relatedTarget
+        let rota = document.querySelector('#datas').value
+        let ponto = marcador.getAttribute('data-point')
+        let serial = document.querySelector('#dispositivos').value
 
-markers.forEach((marker) => {
-    marker.addEventListener('click', () => {
-        console.log('marcelo')
+        document.querySelector('#modalTitle').innerHTML = `Informações do ponto ${Number(ponto)+1} na rota do dia ${rota.replace(/^rota_/, '')}`
+        $.ajax({
+            url: `api/pega_pt?serial=${serial}&rota=${rota}&ponto=${ponto}`,
+            method: 'GET',
+            success: (data) => {
+                modal.querySelector('#modalBody').innerHTML = '<p id="end"><span class="fw-bolder">Endereço não encontrado</span></p>'
+                const create = (label, conteudo, type=false) =>{
+                    if(type){
+                        conteudo = new Date(conteudo)
+
+                        conteudo.setUTCHours(conteudo.getUTCHours() - 3)
+
+                        const horas = String(conteudo.getUTCHours()).padStart(2, '0');
+                        const minutos = String(conteudo.getUTCMinutes()).padStart(2, '0');
+                        const segundos = String(conteudo.getUTCSeconds()).padStart(2, '0');
+
+                        conteudo = `${horas}:${minutos}:${segundos}`;
+
+                    }
+                    let p = document.createElement('p');
+                    p.className = 'text-wrap'
+                    let span = document.createElement('span')
+                    span.className = 'fw-bolder'
+                    span.innerHTML = label
+                    p.appendChild(span)
+                    p.innerHTML += conteudo
+                    modal.querySelector('#modalBody').appendChild(p)
+
+                }
+                
+                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${data.lat}&lon=${data.lon}&format=json`)
+                    .then((res) => {
+                        if(!res.ok){
+                            throw new Error('Não foi possivel acessar a API')
+                        }
+                        return res.json()
+                    })
+                    .then((data) => {
+                        if('road' in data.address){
+                            let end = document.querySelector('#end')
+                            let endereco = data.address.road
+                            
+                            end.innerHTML = '<span class="fw-bolder">Endereço: </span>' + endereco
+                        }
+                    })
+                    .catch(e => {
+                        console.error(e)
+                    })
+                
+                
+                create('Latitude: ', `${data.lat}`)
+                create('Longitude: ', `${data.lon}`)
+                create('Precisão: ', data.precisao)
+                create('Horario: ', `${data.horario_a}`, true)
+                create('Horario de envio: ', `${data.horario_s.replace(/ \d{2}\/\d{2}\/\d{4}/, '')}`)
+                create('Provedor: ', data.provedor)
+                
+
+            },
+            error: () => {
+
+            }
+        })
+
     })
-})
+}

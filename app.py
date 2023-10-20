@@ -142,6 +142,18 @@ def pega_atv():
     atv = time.strftime("%H:%M:%S", time.gmtime(tempo))
 
     return jsonify({'atividade': atv})
+
+# Pegar informações do ponto de acordo com a serial, rota, e ponto
+@app.route('/api/pega_pt', methods=['GET'])
+def pega_pt():
+    serial = request.args.get('serial')
+    doc = collection.find_one({'serial': serial})
+    rota = request.args.get('rota')
+    ponto = request.args.get('ponto')
+
+    doc = dict(doc['rotas'][rota][ponto])
+
+    return jsonify(doc)
     
 
 if __name__ == "__main__":
