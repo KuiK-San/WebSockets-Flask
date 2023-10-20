@@ -1,4 +1,5 @@
 from flask import request, render_template, jsonify
+from flask_limiter import Limiter
 from urllib.parse import parse_qs
 from datetime import datetime
 from conexao import collection
@@ -6,7 +7,6 @@ import threading
 import counter
 import time
 from server import app, socketio
-import math
 
 # Rota padrão
 @app.route('/', methods=['GET'])
