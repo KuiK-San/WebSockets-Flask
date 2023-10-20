@@ -6,6 +6,7 @@ import threading
 import counter
 import time
 from server import app, socketio
+import math
 
 # Rota padrão
 @app.route('/', methods=['GET'])
@@ -34,6 +35,23 @@ def log():
                 if doc['rotas'][rota][point]['horario_a'] == str(data['time'][0]):
                     print('fora!')
                     return jsonify({"status": "Já salvo no servidor"})
+        
+        if f'rota_{dia}' in doc['rotas']:
+
+            quantidade = len(doc['rotas'][f'rota_{dia}'])
+            
+            latUlt = doc['rotas'][f'rota_{dia}'][str(int(quantidade)-1)]['lat']
+            lonUlt = doc['rotas'][f'rota_{dia}'][str(int(quantidade)-1)]['lon']
+
+            if(lat == latUlt and lon and lonUlt):
+                print('!arof')
+                return jsonify({"status": "Já salvo no servidor"})
+            distancia = counter.calcular_distancia_geografica(lat, latUlt, lon, lonUlt)
+            if distancia <= 10:
+                print(f'muito perto {distancia}metros')
+                return jsonify({"status": "Já salvo no servidor"})
+            
+        
         
     if not collection.find_one({'serial': serial}): # Caso não exista nenhum documento com a serial requisitada
         document = {
@@ -72,7 +90,6 @@ def log():
 
     else: # Caso exista o documento e a rota
         doc = collection.find_one({'serial': serial})
-        quantidade = len(doc['rotas'][f'rota_{dia}'])
         collection.update_one({'serial': serial}, {"$set": {
             f"rotas.rota_{dia}.{str(quantidade)}": {
                 'lat': float(lat),

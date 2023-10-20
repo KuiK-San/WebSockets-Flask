@@ -160,8 +160,10 @@ socket.on("message", (message) => {
             initialRouteSet = false;
             routeCoordinates = [];
             totalPts = 0
-            for (const marker of markersArray) {
-                marker.remove();
+            marker.remove()
+            marker = null
+            for (const marcador of markersArray) {
+                marcador.remove();
             }
             markersArray = [];
 
@@ -173,6 +175,8 @@ socket.on("message", (message) => {
                     coordinates: [],
                 },
             });
+            document.querySelector('#prec').classList.add('d-none')
+            document.querySelector('#loca').classList.add('d-none')
         });
         //console.log(routeCoordinates);
 
