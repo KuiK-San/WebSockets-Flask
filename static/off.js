@@ -40,7 +40,9 @@ const getAtt = (serial, type) => { // função que pega a ultima atividade do us
 }
 const excludeAtt = () => { // Função que exclui a precisão da página
     document.querySelector('#acc').innerHTML = ''
-    document.querySelector('#acc').style.display = 'none'
+    document.querySelector('#prec').classList.add('d-none')
+    document.querySelector('#loca').classList.add('d-none')
+
 }
 socket.on('off', (data) => { // Função quando recebe que o usuario está offline
     if(document.querySelector('#dispositivos').value == data.serial && document.querySelector('#datas').value == 'rota_' + getDate()){
@@ -57,10 +59,39 @@ socket.on('off', (data) => { // Função quando recebe que o usuario está offli
 socket.on('message', (data) => { // Função que recebe que o usuario atualizou
     if(document.querySelector('#dispositivos').value == data.serial ){
         excludeAlert()
+        document.querySelector('#prec').classList.remove('d-none')
+        document.querySelector('#loca').classList.remove('d-none')
         document.querySelector('#circuloAtual').classList.add('pulsating-circle')
         let precisao = document.querySelector('#acc')
-        precisao.style.display = 'inline'
         precisao.innerHTML = `Margem de erro: <span class="text-end">${data.precisao} metros</span>`
+        
+        let localidade = document.querySelector('#loc')
+        
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${data.lat}&lon=${data.lon}&format=json`)
+        .then((res) => {
+            if(!res.ok){
+                localidade.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
+                throw new Error('Não foi possivel acessar a API')
+                
+            }
+            return res.json()
+        })
+        .then((data) => {
+            if('road' in data.address){
+                let endereco = data.address.road
+                localidade.style.display = 'inline'
+                
+                localidade.innerHTML = '<span class="fw-bolder">Endereço: </span>' + endereco
+            }else{
+                localidade.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
+                
+            }
+        })
+        .catch(e => {
+            end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
+            console.error(e)
+        })
+        
         
     }
 })

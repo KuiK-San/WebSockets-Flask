@@ -155,8 +155,8 @@ if (modal) {
                         }
                     })
                     .catch(e => {
-                        end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
                         console.error(e)
+                        end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
                     })
                 
                 
