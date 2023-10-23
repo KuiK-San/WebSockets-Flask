@@ -106,7 +106,7 @@ if (modal) {
 
         document.querySelector('#modalTitle').innerHTML = `Informações do ponto ${Number(ponto)+1} na rota do dia ${rota.replace(/^rota_/, '')}`
         $.ajax({
-            url: `api/pega_pt?serial=${serial}&rota=${rota}&ponto=${ponto}`,
+            url: `/api/pega_pt?serial=${serial}&rota=${rota}&ponto=${ponto}`,
             method: 'GET',
             success: (data) => {
                 modal.querySelector('#modalBody').innerHTML = '<p id="end"><span class="fw-bolder">Buscando endereço...</span></p>'
@@ -135,7 +135,7 @@ if (modal) {
                 }
                 
                 let end = document.querySelector('#end')
-                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${data.lat}&lon=${data.lon}&format=json`)
+                fetch(`/api/pega_rua?lat=${data.lat}&lon=${data.lon}`)
                     .then((res) => {
                         if(!res.ok){
                             end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'

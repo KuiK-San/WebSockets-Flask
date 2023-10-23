@@ -1,12 +1,12 @@
 from flask import request, render_template, jsonify
-from flask_limiter import Limiter
 from urllib.parse import parse_qs
 from datetime import datetime
 from conexao import collection
 import threading
 import counter
 import time
-from server import app, socketio
+from server import app, socketio, limiter
+import requests as rq
 
 # Rota padrão
 @app.route('/', methods=['GET'])
@@ -172,6 +172,18 @@ def pega_pt():
 
     return jsonify(doc)
     
+@app.route('/api/pega_rua', methods=['GET'])
+@limiter.limit('1 per second')
+def pega_rua():
+    lon = request.args.get('lon')
+    lat = request.args.get('lat')
+    url = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json'
+
+    res = rq.get(url)
+    if res.status_code == 200:
+        return res.json()
+    
+    return jsonify({'ok': False})
 
 if __name__ == "__main__":
     contador_thread = threading.Thread(target=counter.contador, daemon=True).start()

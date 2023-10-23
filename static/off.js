@@ -57,7 +57,7 @@ socket.on('off', (data) => { // Função quando recebe que o usuario está offli
     }
 })
 socket.on('message', (data) => { // Função que recebe que o usuario atualizou
-    if(document.querySelector('#dispositivos').value == data.serial ){
+    if(document.querySelector('#dispositivos').value == data.serial && document.querySelector('#datas').value == `rota_${getDate()}`){
         excludeAlert()
         document.querySelector('#prec').classList.remove('d-none')
         document.querySelector('#loca').classList.remove('d-none')
@@ -67,7 +67,7 @@ socket.on('message', (data) => { // Função que recebe que o usuario atualizou
         
         let localidade = document.querySelector('#loc')
         
-        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${data.lat}&lon=${data.lon}&format=json`)
+        fetch(`/api/pega_rua?lat=${data.lat}&lon=${data.lon}&format=json`)
         .then((res) => {
             if(!res.ok){
                 localidade.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
