@@ -109,7 +109,7 @@ var lat, lon;
 var marker;
 var ultimaPos;
 
-socket.on("message", (message) => {
+const atualizarPT = (message) => {
     if (
         message.serial == document.querySelector("#dispositivos").value &&
         document.querySelector("#datas").value == "rota_" + getDate()
@@ -185,7 +185,7 @@ socket.on("message", (message) => {
         ).innerHTML = `Precisão de ${message.precisao} metros`;
         document.querySelector("#acc").style.display = `inline`;
     }
-});
+};
 
 function createMaker(type="location", pts=0) {
     if(type === 'location'){
@@ -276,3 +276,7 @@ document.addEventListener("changePts", () => {
         pontos = false;
     }
 });
+
+setInterval(()=>{
+    
+}, 5000)

@@ -185,6 +185,32 @@ def pega_rua():
     
     return jsonify({'ok': False})
 
+@app.route('/api/pegar_pontos_a_partir', methods=['GET'])
+def pegar_pontos_apartir():
+    ultimo = request.args.get('ultimoPt')
+    rota = request.args.get('rota')
+    serial = request.args.get('serial')
+
+    filtro = {rota: {'$gt': ultimo}}
+
+    doc = collection.find_one({'serial': serial})
+    
+    doc.pop('_id')
+
+    pontosApos = {}
+    i = 0
+    for point in doc['rotas']:
+        if i > int(ultimo):
+            pontosApos[i] = point
+        i+=1
+        
+    if len(pontosApos) == 0:
+        return jsonify({'ok': False})
+    
+    return jsonify(dict(pontosApos))
+
+
+
 if __name__ == "__main__":
     contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
     socketio.run(app, host='0.0.0.0', debug=True)
