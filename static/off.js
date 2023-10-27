@@ -127,8 +127,11 @@ document.addEventListener('horas', () => {
     dataAtual.setSeconds(segundos)
     
     intervalo = setInterval(()=>{
-        dataAtual.setSeconds(dataAtual.getSeconds() + 1)
-        document.querySelector('#horario').innerHTML = dataAtual.toLocaleTimeString()
+        let horario = document.querySelector('#horario')
+        if(horario){
+            dataAtual.setSeconds(dataAtual.getSeconds() + 1)
+            document.querySelector('#horario').innerHTML = dataAtual.toLocaleTimeString()
+        }
     }, 1000)
     
 })
