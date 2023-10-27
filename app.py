@@ -5,7 +5,7 @@ from conexao import collection
 import threading
 import counter
 import time
-from server import app, socketio, limiter
+from server import app, limiter
 import requests as rq
 
 # Rota padrão
@@ -16,6 +16,7 @@ def index():
 # Rota para registro e envio de localização para o socket
 @app.route("/log", methods=['POST'])
 def log():
+    counter.contador()
     data = request.data
     dt_str = data.decode('utf-8')
     data = parse_qs(dt_str)
@@ -102,7 +103,7 @@ def log():
             'ultima_att': time.time()
         }})
 
-    socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario, 'serial': serial, 'precisao': round(float(data['acc'][0]), 3)})
+    # socketio.emit('message', {'lat': lat, 'lon': lon, 'horario': horario, 'serial': serial, 'precisao': round(float(data['acc'][0]), 3)})
     
 
     return jsonify({"status": "200"})
@@ -211,8 +212,13 @@ def pegar_pontos_apartir():
 
     return jsonify(dict(pontosApos))
 
+@app.route('/api/att', methods=['GET'])
+def atualizar():
+    
+
+    return True
 
 
 if __name__ == "__main__":
-    contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
+    # contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
     app.run(host='0.0.0.0', debug=True)
