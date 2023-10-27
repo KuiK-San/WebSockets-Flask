@@ -120,7 +120,7 @@ const atualizarPT = (message) => {
         }
         markersArray.push(ultimaPos);
     }
-    console.log(message)
+    // console.log(message)
     lat = parseFloat(message.lat);
     lon = parseFloat(message.lon);
 
