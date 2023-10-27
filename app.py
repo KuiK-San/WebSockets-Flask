@@ -199,18 +199,20 @@ def pegar_pontos_apartir():
 
     pontosApos = {}
     i = 0
-    for point in doc['rotas']:
+    for point in doc['rotas'][rota]:
         if i > int(ultimo):
-            pontosApos[i] = point
+            pontosApos[str(i)] = doc['rotas'][rota][point]
         i+=1
         
+    
     if len(pontosApos) == 0:
         return jsonify({'ok': False})
-    
+    pontosApos['ok'] = True
+
     return jsonify(dict(pontosApos))
 
 
 
 if __name__ == "__main__":
     contador_thread = threading.Thread(target=counter.contador, daemon=True).start()
-    socketio.run(app, host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=True)

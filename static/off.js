@@ -1,8 +1,16 @@
 // var offline = document.querySelector('#offline')
 const remover = new Event('remover')
 const alertPlaceholder = document.getElementById('offline')
+var intervalo
 
 const makeAlert = (message, type) => { // Função para excluir alerta atual (se exibido) e adicionar um com a nova mensagem
+    let alerta = document.querySelector('#alerta')
+    if(alerta){
+        if(alerta.classList.contains(`alert-${type}`)){
+            alerta.innerHTML =  `<div>${message}</div>`
+            return
+        }
+    }
     const wrapper = document.createElement('div')
     
     if(type === 'warning'){
@@ -31,7 +39,9 @@ const getAtt = (serial, type) => { // função que pega a ultima atividade do us
         url: `/api/pega_atv?serial=${serial}`,
         method: 'GET',
         success: (data) => {
-            makeAlert(`Última atualização do usúario há ${data.atividade}`, type)
+            const horario = new Event('horas')
+            makeAlert(`Última atualização do usúario há <span id="horario">${data.atividade}</span>`, type)
+            document.dispatchEvent(horario)
         },
         error: () => {
             console.log('ERRO')
@@ -44,30 +54,26 @@ const excludeAtt = () => { // Função que exclui a precisão da página
     document.querySelector('#loca').classList.add('d-none')
 
 }
-socket.on('off', (data) => { // Função quando recebe que o usuario está offline
-    if(document.querySelector('#dispositivos').value == data.serial && document.querySelector('#datas').value == 'rota_' + getDate()){
-        getAtt(document.querySelector('#dispositivos').value, 'danger')
-        excludeAtt()
-        let circulo = document.querySelector('#circuloAtual')
-        if(circulo != null){
-            circulo.classList.remove('pulsating-circle')
-        }
-    }else{
-        excludeAlert()
+document.addEventListener('off', () => { // Função quando recebe que o usuario está offline
+    getAtt(document.querySelector('#dispositivos').value, 'danger')
+    excludeAtt()
+    let circulo = document.querySelector('#circuloAtual')
+    if(circulo != null){
+        circulo.classList.remove('pulsating-circle')
     }
 })
-socket.on('message', (data) => { // Função que recebe que o usuario atualizou
-    if(document.querySelector('#dispositivos').value == data.serial && document.querySelector('#datas').value == `rota_${getDate()}`){
+/* socket.on('message', (message) => { // Função que recebe que o usuario atualizou
+    if(document.querySelector('#dispositivos').value == message.serial && document.querySelector('#datas').value == `rota_${getDate()}`){
         excludeAlert()
         document.querySelector('#prec').classList.remove('d-none')
         document.querySelector('#loca').classList.remove('d-none')
         document.querySelector('#circuloAtual').classList.add('pulsating-circle')
         let precisao = document.querySelector('#acc')
-        precisao.innerHTML = `Margem de erro: <span class="text-end">${data.precisao} metros</span>`
+        precisao.innerHTML = `Margem de erro: <span class="text-end">${message.precisao} metros</span>`
         
         let localidade = document.querySelector('#loc')
         
-        fetch(`/api/pega_rua?lat=${data.lat}&lon=${data.lon}&format=json`)
+        fetch(`/api/pega_rua?lat=${message.lat}&lon=${message.lon}&format=json`)
         .then((res) => {
             if(!res.ok){
                 localidade.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
@@ -94,7 +100,7 @@ socket.on('message', (data) => { // Função que recebe que o usuario atualizou
         
         
     }
-})
+}) */
 document.addEventListener('verificarAtv', () => { // Função que para verificar a ultima atulização do usuario e cria um alert
     if(document.querySelector('#datas').value == 'rota_' + getDate()){
         getAtt(document.querySelector('#dispositivos').value, 'warning')
@@ -106,3 +112,23 @@ document.addEventListener('verificarAtv', () => { // Função que para verificar
 document.querySelector('#dispositivos').addEventListener('change', () => { // Função que exclui os alertas quando o usuario muda o dispositivo selecionado
     excludeAlert()
 } )
+
+document.addEventListener('horas', () => {
+    if(intervalo){
+        clearInterval(intervalo)
+    }
+    let horario = document.querySelector('#horario').textContent
+    
+    const [horas, minutos, segundos] = horario.split(':').map(Number)
+    
+    const dataAtual = new Date()
+    dataAtual.setHours(horas)
+    dataAtual.setMinutes(minutos)
+    dataAtual.setSeconds(segundos)
+    
+    intervalo = setInterval(()=>{
+        dataAtual.setSeconds(dataAtual.getSeconds() + 1)
+        document.querySelector('#horario').innerHTML = dataAtual.toLocaleTimeString()
+    }, 1000)
+    
+})

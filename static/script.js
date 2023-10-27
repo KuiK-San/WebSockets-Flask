@@ -1,8 +1,8 @@
 let allcoords = [];
 var markersArray = [];
 var i = 0;
-var socket = io.connect("http://" + document.domain + ":" + location.port);
-let coordsElement = document.querySelector("#coord");
+/*var socket = io.connect("http://" + document.domain + ":" + location.port); */
+/* let coordsElement = document.querySelector("#coord"); */
 let routeCoordinates = [];
 var initialRouteSet;
 var totalPts = 0
@@ -110,82 +110,112 @@ var marker;
 var ultimaPos;
 
 const atualizarPT = (message) => {
-    if (
-        message.serial == document.querySelector("#dispositivos").value &&
-        document.querySelector("#datas").value == "rota_" + getDate()
-    ) {
-        if (lat != null && lon != null) {
-            // console.log('criador de posição')
-            const ultimaPos = new mapboxgl.Marker({
-                element: createMaker('default', totalPts++)
-            }).setLngLat([lon, lat]);
-            if (pontos) {
-                ultimaPos.addTo(map);
-            }
-            markersArray.push(ultimaPos);
+    if (lat != null && lon != null) {
+        // console.log('criador de posição')
+        const ultimaPos = new mapboxgl.Marker({
+            element: createMaker('default', totalPts++)
+        }).setLngLat([lon, lat]);
+        if (pontos) {
+            ultimaPos.addTo(map);
         }
-        lat = parseFloat(message.lat);
-        lon = parseFloat(message.lon);
+        markersArray.push(ultimaPos);
+    }
+    console.log(message)
+    lat = parseFloat(message.lat);
+    lon = parseFloat(message.lon);
 
-        routeCoordinates.push([message.lon, message.lat]);
-        // document.querySelector('#coord').innerHTML = routeCoordinates.toString()
+    routeCoordinates.push([message.lon, message.lat]);
+    // document.querySelector('#coord').innerHTML = routeCoordinates.toString()
 
-        if (!marker) {
-            marker = new mapboxgl.Marker({
-                element: createMaker(),
-            })
-                .setLngLat([message.lon, message.lat])
-                .addTo(map);
+    if (!marker) {
+        marker = new mapboxgl.Marker({
+            element: createMaker(),
+        })
+            .setLngLat([message.lon, message.lat])
+            .addTo(map);
 
-            map.flyTo({
-                center: [message.lon, message.lat],
-                zoom: 17,
-            });
-        } else {
-            marker.setLngLat([message.lon, message.lat]);
-            map.flyTo({
-                center: [message.lon, message.lat],
-            });
+        map.flyTo({
+            center: [message.lon, message.lat],
+            zoom: 17,
+        });
+    } else {
+        marker.setLngLat([message.lon, message.lat]);
+        map.flyTo({
+            center: [message.lon, message.lat],
+        });
+    }
+    map.getSource("route").setData({
+        type: "Feature",
+        properties: {},
+        geometry: {
+            type: "LineString",
+            coordinates: routeCoordinates,
+        },
+    });
+
+    document.addEventListener("limparMapa", () => {
+        initialRouteSet = false;
+        routeCoordinates = [];
+        totalPts = 0
+        marker.remove()
+        marker = null
+        for (const marcador of markersArray) {
+            marcador.remove();
         }
+        markersArray = [];
+
         map.getSource("route").setData({
             type: "Feature",
             properties: {},
             geometry: {
                 type: "LineString",
-                coordinates: routeCoordinates,
+                coordinates: [],
             },
         });
+        document.querySelector('#prec').classList.add('d-none')
+        document.querySelector('#loca').classList.add('d-none')
+    });
+    //console.log(routeCoordinates);
 
-        document.addEventListener("limparMapa", () => {
-            initialRouteSet = false;
-            routeCoordinates = [];
-            totalPts = 0
-            marker.remove()
-            marker = null
-            for (const marcador of markersArray) {
-                marcador.remove();
+    document.querySelector(
+        "#acc"
+    ).innerHTML = `Precisão de ${message.precisao} metros`;
+    document.querySelector("#acc").style.display = `inline`;
+
+    excludeAlert()
+        document.querySelector('#prec').classList.remove('d-none')
+        document.querySelector('#loca').classList.remove('d-none')
+        document.querySelector('#circuloAtual').classList.add('pulsating-circle')
+        let precisao = document.querySelector('#acc')
+        precisao.innerHTML = `Margem de erro: <span class="text-end">${message.precisao} metros</span>`
+        
+        let localidade = document.querySelector('#loc')
+        
+        fetch(`/api/pega_rua?lat=${message.lat}&lon=${message.lon}&format=json`)
+        .then((res) => {
+            if(!res.ok){
+                localidade.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
+                throw new Error('Não foi possivel acessar a API')
+                
             }
-            markersArray = [];
-
-            map.getSource("route").setData({
-                type: "Feature",
-                properties: {},
-                geometry: {
-                    type: "LineString",
-                    coordinates: [],
-                },
-            });
-            document.querySelector('#prec').classList.add('d-none')
-            document.querySelector('#loca').classList.add('d-none')
-        });
-        //console.log(routeCoordinates);
-
-        document.querySelector(
-            "#acc"
-        ).innerHTML = `Precisão de ${message.precisao} metros`;
-        document.querySelector("#acc").style.display = `inline`;
-    }
-};
+            return res.json()
+        })
+        .then((data) => {
+            if('road' in data.address){
+                let endereco = data.address.road
+                localidade.style.display = 'inline'
+                
+                localidade.innerHTML = '<span class="fw-bolder">Endereço: </span>' + endereco
+            }else{
+                localidade.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
+                
+            }
+        })
+        .catch(e => {
+            end.innerHTML = '<span class="fw-bolder">Endereço Não Encontrado</span>'
+            console.error(e)
+        })
+}
 
 function createMaker(type="location", pts=0) {
     if(type === 'location'){
@@ -277,6 +307,47 @@ document.addEventListener("changePts", () => {
     }
 });
 
+var counter = 1
 setInterval(()=>{
-    
+    let executar = document.querySelector('#datas').value
+    if(executar == 'Selecione uma data'){
+        return
+    }
+    if(document.querySelector('#datas').value != null){
+        // console.log(routeCoordinates.length)
+        if(document.querySelector('#datas').value != `rota_${getDate()}`){
+            return
+        }
+        $.ajax({
+        url: `/api/pegar_pontos_a_partir?ultimoPt=${routeCoordinates.length - 1}&rota=${document.querySelector('#datas').value}&serial=${document.querySelector('#dispositivos').value}`,
+        method: 'GET',
+        success: (data) => {
+            if(!data.ok){
+                if(counter == 0 ){
+                    return
+                }
+                // console.log(counter)
+                counter++
+                if(counter > 12){
+                    const off = new Event('off')
+                    document.dispatchEvent(off)
+                    counter = 0
+                }
+                return
+            }
+            counter = 1
+            let pts = Object.keys(data)
+            pts.pop('ok')
+            for (let i = 0; i < pts.length; i++) {
+                let message = {
+                    'lat': data[pts[i]]['lat'], 
+                    'lon': data[pts[i]]['lon'],
+                    'horario': data[pts[i]]['horario_s'], 
+                    'serial': document.querySelector('#dispositivos').value, 
+                    'precisao': data[pts[i]]['precisao']
+                }
+                atualizarPT(message)
+            }
+        }
+    })}
 }, 5000)
